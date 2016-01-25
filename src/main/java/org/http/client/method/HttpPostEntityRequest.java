@@ -15,7 +15,11 @@ public class HttpPostEntityRequest extends HttpPostRequest{
 	private RequestEntity requestEntity;
 	
 	public HttpPostEntityRequest(String baseUrl , RequestEntity requestEntity) {
-		super(baseUrl);
+		this(baseUrl , requestEntity , false);
+	}
+	
+	public HttpPostEntityRequest(String baseUrl , RequestEntity requestEntity , boolean isRetry) {
+		super(baseUrl,isRetry);
 		this.requestEntity = requestEntity;
 	}
 

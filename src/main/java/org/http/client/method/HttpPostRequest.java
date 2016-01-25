@@ -14,8 +14,23 @@ import org.http.support.BaseHttpRequest;
  */
 public class HttpPostRequest extends BaseHttpRequest{
 
+	/**
+	 * @see {@link BaseHttpRequest } constructor
+	 * @param baseUrl
+	 * 2016年1月25日 下午4:12:57
+	 */
 	public HttpPostRequest(String baseUrl) {
 		super(baseUrl);
+	}
+
+	/**
+	 * @see {@link BaseHttpRequest } constructor
+	 * @param baseUrl
+	 * @param isRetry
+	 * 2016年1月25日 下午4:13:01
+	 */
+	public HttpPostRequest(String baseUrl, boolean isRetry) {
+		super(baseUrl, isRetry);
 	}
 
 	@Override

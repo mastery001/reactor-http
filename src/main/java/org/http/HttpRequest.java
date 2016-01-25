@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.NameValuePair;
 
 /**
  * http请求基类
@@ -15,9 +14,11 @@ import org.apache.commons.httpclient.NameValuePair;
  */
 public interface HttpRequest {
 
-	NameValuePair[] EMPTY_NAMEVALUE_PAIRS = new NameValuePair[] {};
-
-	String DEFAULT_CHARET = "UTF-8";
+	/**
+	 * 默认重试次数
+	 * 2016年1月25日 下午4:00:53
+	 */
+	int DEFAULT_RETRY_COUNT = 3;
 
 	/**
 	 * 发送http请求

@@ -28,6 +28,10 @@ import org.http.chain.support.HttpRetryHandler;
 
 public abstract class BaseHttpRequest implements HttpRequest {
 
+	public static final NameValuePair[] EMPTY_NAMEVALUE_PAIRS = new NameValuePair[] {};
+
+	public static final String DEFAULT_CHARET = "UTF-8";
+	
 	protected final String baseUrl;
 
 	/**
@@ -47,9 +51,24 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	 */
 	protected final ParamBuilder paramBuilder = new ParamBuilder();
 
+	/**
+	 * 默认采用非重试机制发送请求
+	 * @param baseUrl
+	 * 2016年1月25日 下午4:07:41
+	 */
 	public BaseHttpRequest(String baseUrl) {
+		this(baseUrl,false);
+	}
+	
+	public BaseHttpRequest(String baseUrl , boolean isRetry) {
 		this.baseUrl = baseUrl;
 		method = innerInitMethod();
+		if(method == null) {
+			throw new NullPointerException("Implementation class must have method parameter");
+		}
+		if(isRetry) { 
+			setRetryCount(DEFAULT_RETRY_COUNT);
+		}
 		requestMessage = new HttpRequestMessageImpl(method, paramBuilder);
 	}
 
