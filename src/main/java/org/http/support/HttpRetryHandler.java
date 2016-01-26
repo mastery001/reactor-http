@@ -1,4 +1,4 @@
-package org.http.chain.support;
+package org.http.support;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

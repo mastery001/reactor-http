@@ -21,7 +21,7 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	public DefaultHttpFilterChainBuilder() {
 		entries = new CopyOnWriteArrayList();
 	}
-
+	
 	/**
 	 * @see HttpFilterChain#getEntry(String)
 	 */

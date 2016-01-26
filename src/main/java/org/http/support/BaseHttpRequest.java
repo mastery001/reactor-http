@@ -28,7 +28,6 @@ import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestMessage;
 import org.http.HttpResponseMessage;
-import org.http.chain.support.HttpRetryHandler;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
 

@@ -19,12 +19,12 @@ public interface HttpSession {
 	 */
 	HttpHandler getHandler();
 
-	/**
-	 * 获取server
-	 * 
-	 * @return 2016年1月19日 上午11:33:11
-	 */
-	HttpService getService();
+//	/**
+//	 * 获取server
+//	 * 
+//	 * @return 2016年1月19日 上午11:33:11
+//	 */
+//	HttpService getService();
 	
 	
 	/**

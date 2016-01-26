@@ -42,7 +42,7 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 			}
 
 		});
-		startWork(new Runnable() {
+		startAsyncWork(session, new Runnable() {
 
 			public void run() {
 				HttpClientFilterChain.super.fireSessionCreated(session);
@@ -60,10 +60,12 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 			}
 
 		});
-		startWork(new Runnable() {
+		startAsyncWork(session, new Runnable() {
 
 			public void run() {
-				HttpClientFilterChain.super.fireSessionClosed(session);
+				synchronized (session) {
+					HttpClientFilterChain.super.fireSessionClosed(session);
+				}
 			}
 		});
 
@@ -79,10 +81,11 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 			}
 
 		});
-		startWork(new Runnable() {
+		startAsyncWork(session, new Runnable() {
 
 			public void run() {
 				HttpClientFilterChain.super.fireRequestFailed(session, responseMessage);
+
 			}
 		});
 
@@ -98,10 +101,11 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 			}
 
 		});
-		startWork(new Runnable() {
+		startAsyncWork(session, new Runnable() {
 
 			public void run() {
 				HttpClientFilterChain.super.fireRequestSuccessed(session, responseMessage);
+
 			}
 		});
 	}
@@ -113,10 +117,11 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 			@Override
 			public void run() throws Exception {
 				session.getHandler().exceptionCaught(session, cause);
+
 			}
 
 		});
-		startWork(new Runnable() {
+		startAsyncWork(session, new Runnable() {
 
 			public void run() {
 				HttpClientFilterChain.super.fireExceptionCaught(session, cause);
@@ -136,8 +141,10 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 	 * @param runnable
 	 *            2016年1月20日 下午1:42:13
 	 */
-	private void startWork(Runnable runnable) {
-		executor.execute(new NamePreservingRunnable(runnable, threadName));
+	private void startAsyncWork(HttpSession session, Runnable runnable) {
+		synchronized (session) {
+			executor.execute(new NamePreservingRunnable(runnable, threadName));
+		}
 	}
 
 	/**
@@ -156,16 +163,17 @@ class HttpClientFilterChain extends BaseHttpFilterChain {
 
 	/**
 	 * 同步执行handler
+	 * 
 	 * @param session
 	 * @param run
-	 * 2016年1月21日 上午10:54:24
+	 *            2016年1月21日 上午10:54:24
 	 */
 	public void executeHandler(final HttpSession session, Runner run) {
 		if (handlerEmpty(session.getHandler())) {
 			try {
 				run.run();
 			} catch (final Exception e) {
-				startWork(new Runnable() {
+				startAsyncWork(session, new Runnable() {
 
 					public void run() {
 						HttpClientFilterChain.super.fireExceptionCaught(session, e);

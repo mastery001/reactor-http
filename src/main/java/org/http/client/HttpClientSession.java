@@ -44,7 +44,6 @@ class HttpClientSession extends BaseHttpSession {
 		return filterChain;
 	}
 
-	@Override
 	public HttpService getService() {
 		return service;
 	}

@@ -12,8 +12,7 @@ import org.http.chain.HttpFilter.NextHttpFilter;
 import org.http.chain.HttpFilterAdapter;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.http.chain.util.ExceptionMonitor;
 
 /**
  * 基础http处理链实现
@@ -23,8 +22,6 @@ import org.slf4j.LoggerFactory;
  *         2016年1月19日 下午1:17:18
  */
 public abstract class BaseHttpFilterChain implements HttpFilterChain {
-
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<String, Entry> name2entry = new HashMap<String, Entry>();
 
@@ -275,7 +272,7 @@ public abstract class BaseHttpFilterChain implements HttpFilterChain {
 		try {
 			entry.getFilter().exceptionCaught(entry.getNextFilter(), session, cause);
 		} catch (Throwable e) {
-			logger.warn("Unexpected exception from exceptionCaught handler.", e);
+			ExceptionMonitor.getInstance().exceptionCaught(e);
 		}
 	}
 

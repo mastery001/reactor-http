@@ -3,6 +3,7 @@ package org.http.chain.support;
 import org.http.chain.DefaultHttpFilterChainBuilder;
 import org.http.chain.HttpFilterChainBuilder;
 import org.http.chain.HttpService;
+import org.http.chain.util.ExceptionMonitor;
 
 public abstract class BaseHttpService implements HttpService {
 	private HttpFilterChainBuilder filterChainBuilder = new DefaultHttpFilterChainBuilder();
@@ -22,8 +23,12 @@ public abstract class BaseHttpService implements HttpService {
 	}
 
 	@Override
-	public void close() throws Exception {
-		getFilterChain().clear();
+	public void release(){
+		try {
+			getFilterChain().clear();
+		} catch (Exception e) {
+			ExceptionMonitor.getInstance().exceptionCaught(e);
+		}
 	}
 
 }

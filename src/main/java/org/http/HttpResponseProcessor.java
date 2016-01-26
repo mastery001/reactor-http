@@ -1,5 +1,7 @@
 package org.http;
 
+import org.http.exception.HttpResponseProcessException;
+
 /**
  * HttpResponse的结果处理器
  * 
@@ -19,6 +21,6 @@ public interface HttpResponseProcessor {
 	 * @throws Exception
 	 *             2016年1月19日下午10:15:54
 	 */
-	public <T> T handleHttpResponse(HttpResponseMessage response, Class<T> clazz) throws Exception;
+	public <T> T handleHttpResponse(HttpResponseMessage response, Class<T> clazz) throws HttpResponseProcessException;
 
 }

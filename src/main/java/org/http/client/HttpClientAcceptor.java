@@ -9,11 +9,10 @@ import org.http.HttpResponseMessage;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpSession;
+import org.http.chain.util.ExceptionMonitor;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpSessionClosedException;
 import org.http.support.BaseHttpAcceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 使用线程池来实现httpClient
@@ -24,8 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HttpClientAcceptor extends BaseHttpAcceptor {
 
-	private final Logger logger = LoggerFactory.getLogger(HttpClientAcceptor.class);
-
+	@SuppressWarnings("unused")
 	private final ExecutorService executor;
 
 	/**
@@ -33,7 +31,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 	 */
 	private final int processorCount;
 
-	private int processorDistributor = 0;
+//	private int processorDistributor = 0;
 
 	/**
 	 * @noinspection StaticNonFinalField
@@ -42,6 +40,10 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 
 	private final int id = nextId++;
 
+	/**
+	 * 预留http处理者的数组，可能以后会修改成异步调用http的方式
+	 * 2016年1月26日 下午5:11:39
+	 */
 	private final HttpClientFilterProccessor httpProcessor[];
 
 	/**
@@ -57,7 +59,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 	private HttpFilterChain filterChain;
 
 	public HttpClientAcceptor() {
-		this(null, 5, Executors.newCachedThreadPool());
+		this(null, 1, Executors.newCachedThreadPool());
 	}
 
 	public HttpClientAcceptor(HttpClientFactory httpClientFactory, int processorCount, ExecutorService executor) {
@@ -72,10 +74,10 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 		this.executor = executor;
 		this.processorCount = processorCount;
 		httpProcessor = new HttpClientFilterProccessor[this.processorCount];
-
-		for (int i = 0; i < processorCount; i++) {
-			httpProcessor[i] = new HttpClientFilterProccessor("HttpClientFilterProccessor-" + id + "." + i, executor);
-		}
+		httpProcessor[0] = new HttpClientFilterProccessor("HttpClientFilterProccessor-" + id + "." + 1, executor);
+//		for (int i = 0; i < processorCount; i++) {
+//			httpProcessor[i] = new HttpClientFilterProccessor("HttpClientFilterProccessor-" + id + "." + i, executor);
+//		}
 	}
 
 	@Override
@@ -102,7 +104,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 				buildOk();
 			}
 		} catch (Exception e) {
-			logger.warn("Unexpected exception.", e);
+			ExceptionMonitor.getInstance().exceptionCaught(e);
 		}
 		session.getFilterChain().fireSessionCreated(session);
 		return session;
@@ -122,17 +124,18 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 	 * @return 2016年1月19日 下午1:54:10
 	 */
 	private HttpClientFilterProccessor getProcessor() {
-		if (this.processorDistributor == Integer.MAX_VALUE) {
-			this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
-		}
-
-		return httpProcessor[processorDistributor++ % processorCount];
+		return httpProcessor[0];
+//		if (this.processorDistributor == Integer.MAX_VALUE) {
+//			this.processorDistributor = Integer.MAX_VALUE % this.processorCount;
+//		}
+//
+//		return httpProcessor[processorDistributor++ % processorCount];
 	}
 
 	@Override
-	public void close() throws Exception {
-		super.close();
-		executor.shutdown();
+	public void release(){
+		super.release();
+		isBuildChain = false;
 	}
 
 }

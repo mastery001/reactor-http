@@ -2,7 +2,8 @@ package org.http.exception;
 
 /**
  * http调用异常
- * 
+ *  该异常一般都嵌套了一个其代表的真实异常,但是调用者
+ *  @Notes: 该异常只是异常的包装器，不接收与Throwable无关的参数（当然InvokeErrorCode除外）
  * @author zouziwen
  *
  *         2016年1月25日 下午5:26:14
@@ -24,7 +25,7 @@ public class HttpInvokeException extends Exception {
 	}
 
 	public HttpInvokeException(InvokeErrorCode errorCode, Throwable cause) {
-		super(cause);
+		super(cause.getMessage(), cause);
 		this.errorCode = errorCode;
 	}
 
@@ -37,11 +38,8 @@ public class HttpInvokeException extends Exception {
 	}
 
 	@Override
-	public String toString() {
-		String s = getClass().getName();
-		String message = getLocalizedMessage();
-		String join = "errorCode is :" + errorCode.mesage + ";and concrete exception is :";
-		return (message != null) ? (s + join + message) : s;
+	public String getMessage() {
+		return "errorCode is : " + errorCode + "{" + errorCode.mesage + "},concrete message is " + super.getMessage();
 	}
 
 	/**
@@ -67,6 +65,11 @@ public class HttpInvokeException extends Exception {
 		 * socket连接超时 2016年1月25日 下午7:42:25
 		 */
 		SOCKET_CONNECT_TIME_OUT("socket session connect time out"),
+
+		/**
+		 * 当将http返回的数据转换出错时的异常 2016年1月26日 下午2:40:16
+		 */
+		HTTP_RESPONSE_PROCESS("http response process exception"),
 
 		/**
 		 * 当请求来不及处理报出异常 2016年1月25日 下午7:40:23

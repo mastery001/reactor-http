@@ -1,24 +1,24 @@
 package org.http.chain.support;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.http.chain.HttpSession;
 
-public abstract class BaseHttpSession implements HttpSession{
+public abstract class BaseHttpSession implements HttpSession {
 
-	private final ConcurrentMap<String, Object> attributes = new ConcurrentHashMap<String, Object>(8);
-	
+	private final Map<String, Object> attributes = new HashMap<String, Object>(8);
+
 	private final long createTime;
-	
+
 	private long lastAccessedTime;
-	
+
 	private boolean close;
-	
+
 	public BaseHttpSession() {
-		createTime = lastAccessedTime= System.currentTimeMillis();
+		createTime = lastAccessedTime = System.currentTimeMillis();
 	}
-	
+
 	@Override
 	public long getCreateTime() {
 		return createTime;
@@ -28,7 +28,7 @@ public abstract class BaseHttpSession implements HttpSession{
 	public long getLastAccessedTime() {
 		return lastAccessedTime;
 	}
-	
+
 	public void setLastAccessedTime(long lastAccessedTime) {
 		this.lastAccessedTime = lastAccessedTime;
 	}
@@ -40,27 +40,37 @@ public abstract class BaseHttpSession implements HttpSession{
 
 	@Override
 	public Object setAttribute(String key, Object value) {
-		return attributes.putIfAbsent(key, value);
+		synchronized (attributes) {
+			return attributes.put(key, value);
+		}
+
 	}
 
 	@Override
 	public Object getAttribute(String key) {
-		return attributes.get(key);
+		synchronized (attributes) {
+			return attributes.get(key);
+		}
+
 	}
 
 	@Override
 	public Object removeAttribute(String key) {
-		return attributes.remove(key);
+		synchronized (attributes) {
+			return attributes.remove(key);
+		}
+
 	}
 
 	@Override
 	public boolean containsAttribute(String key) {
-		return attributes.containsKey(key);
+		return getAttribute(key) != null;
+
 	}
 
 	@Override
 	public void close() {
-		if(!isClose()) {
+		if (!isClose()) {
 			close = true;
 		}
 		close0();
@@ -72,5 +82,5 @@ public abstract class BaseHttpSession implements HttpSession{
 	public boolean isClose() {
 		return close;
 	}
-	
+
 }
