@@ -7,12 +7,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
- * 抽象http返回jsop数据的处理器
- * 
+ * 默认http返回jsop数据的处理器
+ * 	返回的是传递参数Class<T> clazz的对应的类
  * @author mastery
  * @time 2016年1月19日下午10:22:21
  */
-public abstract class HttpJsonProcessor implements HttpResponseProcessor {
+public class HttpJsonProcessor implements HttpResponseProcessor {
 
 	@Override
 	public <T> T handleHttpResponse(HttpResponseMessage response, Class<T> clazz) throws Exception {
@@ -23,6 +23,8 @@ public abstract class HttpJsonProcessor implements HttpResponseProcessor {
 		return null;
 	}
 
-	protected abstract <T> T innerHandleResponse(JSONObject resultJsonObject, Class<T> clazz);
+	protected <T> T innerHandleResponse(JSONObject resultJsonObject, Class<T> clazz) {
+		return JSON.toJavaObject(resultJsonObject, clazz);
+	}
 
 }

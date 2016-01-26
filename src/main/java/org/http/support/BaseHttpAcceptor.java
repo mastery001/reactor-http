@@ -8,6 +8,8 @@ import org.http.HttpResponseMessage;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpSession;
 import org.http.chain.support.BaseHttpService;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpSessionClosedException;
 
 public abstract class BaseHttpAcceptor extends BaseHttpService implements HttpAcceptor {
 
@@ -25,12 +27,12 @@ public abstract class BaseHttpAcceptor extends BaseHttpService implements HttpAc
 	}
 
 	@Override
-	public HttpResponseMessage service(HttpRequest request) throws Exception {
+	public HttpResponseMessage service(HttpRequest request) throws HttpSessionClosedException, HttpInvokeException {
 		return this.service(request, null);
 	}
 
 	@Override
-	public HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws Exception {
+	public HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 		// 准备service
 		HttpSession session = prepareService(request, handler);
 
@@ -40,7 +42,7 @@ public abstract class BaseHttpAcceptor extends BaseHttpService implements HttpAc
 	/**
 	 * service的准备工作 2016年1月20日 下午1:09:57
 	 */
-	protected abstract HttpSession prepareService(HttpRequest request, HttpHandler handler);
+	protected abstract HttpSession prepareService(HttpRequest request, HttpHandler handler)  throws HttpSessionClosedException, HttpInvokeException ;
 
 	/**
 	 * 具体的service的实现者
@@ -49,8 +51,9 @@ public abstract class BaseHttpAcceptor extends BaseHttpService implements HttpAc
 	 * @param handler
 	 * @param session
 	 * @return 2016年1月20日 下午1:45:35
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	protected abstract HttpResponseMessage doService(HttpRequest request, HttpHandler handler, HttpSession session) throws Exception;
+	protected abstract HttpResponseMessage doService(HttpRequest request, HttpHandler handler, HttpSession session)
+			 throws HttpSessionClosedException, HttpInvokeException ;
 
 }

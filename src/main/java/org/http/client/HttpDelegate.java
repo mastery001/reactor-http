@@ -8,6 +8,8 @@ import org.http.HttpResponseMessage;
 import org.http.chain.DefaultHttpFilterChainBuilder;
 import org.http.chain.HttpFilter;
 import org.http.chain.HttpHandler;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpSessionClosedException;
 
 /**
  * http代理请求发送者
@@ -38,12 +40,12 @@ public class HttpDelegate implements HttpAcceptor{
 	}
 
 	@Override
-	public HttpResponseMessage service(HttpRequest request) throws Exception {
+	public HttpResponseMessage service(HttpRequest request)  throws HttpSessionClosedException, HttpInvokeException  {
 		return server.service(request);
 	}
 
 	@Override
-	public HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws Exception {
+	public HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 		return server.service(request,handler);
 	}
 	

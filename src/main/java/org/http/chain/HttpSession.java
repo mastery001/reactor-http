@@ -1,6 +1,7 @@
 package org.http.chain;
 
 import org.http.HttpRequest;
+import org.http.exception.HttpSessionClosedException;
 
 /**
  * 每个请求会有一个独立的session
@@ -45,7 +46,13 @@ public interface HttpSession {
 	 */
 	boolean isClose();
 
-	HttpFilterChain getFilterChain();
+	/**
+	 * 获取处理链
+	 * @return
+	 * @throws HttpSessionClosedException	可能会抛出HttpCloseException
+	 * 2016年1月25日 下午8:00:30
+	 */
+	HttpFilterChain getFilterChain() throws HttpSessionClosedException;
 
 	/**
 	 * 获得session名称，其实是请求的url

@@ -9,6 +9,8 @@ import org.http.HttpResponseMessage;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpSession;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpSessionClosedException;
 import org.http.support.BaseHttpAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +80,13 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 
 	@Override
 	protected HttpResponseMessage doService(HttpRequest request, HttpHandler handler, HttpSession session)
-			throws Exception {
+			 throws HttpSessionClosedException, HttpInvokeException {
 		HttpClientSession clientSession = (HttpClientSession) session;
 		return clientSession.getProcessor().doWork(request, clientSession, httpClientFactory);
 	}
 
 	@Override
-	protected HttpClientSession prepareService(HttpRequest request, HttpHandler handler) {
+	protected HttpClientSession prepareService(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 
 		// 获取具体的处理者
 		HttpClientFilterProccessor processor = getProcessor();

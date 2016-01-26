@@ -1,12 +1,15 @@
 package org.http;
 
 import org.http.chain.HttpHandler;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpSessionClosedException;
 
 /**
  * http访问者
+ * 
  * @author zouziwen
  *
- * 2016年1月20日 下午2:05:22
+ *         2016年1月20日 下午2:05:22
  */
 public interface HttpAcceptor {
 
@@ -15,10 +18,11 @@ public interface HttpAcceptor {
 	 * 
 	 * @param request
 	 * @return
-	 * @throws Exception
+	 * @throws HttpSessionClosedException   请求强制关闭的异常
+	 * @throws HttpInvokeException			请求调用时产生的异常
 	 *             2016年1月18日 下午8:02:53
 	 */
-	HttpResponseMessage service(HttpRequest request) throws Exception;
+	HttpResponseMessage service(HttpRequest request) throws HttpSessionClosedException, HttpInvokeException;
 
 	/**
 	 * 针对单个http请求的个性化操作
@@ -27,8 +31,10 @@ public interface HttpAcceptor {
 	 * @param handler
 	 *            个性化操作
 	 * @return
-	 * @throws Exception
+	 * @throws HttpSessionClosedException   请求强制关闭的异常
+	 * @throws HttpInvokeException			请求调用时产生的异常
 	 *             2016年1月19日 下午5:03:23
 	 */
-	HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws Exception;
+	HttpResponseMessage service(HttpRequest request, HttpHandler handler)
+			throws HttpSessionClosedException, HttpInvokeException;
 }

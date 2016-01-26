@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpException;
+import org.http.exception.HttpInvokeException;
 
 /**
  * http请求基类
@@ -15,8 +16,7 @@ import org.apache.commons.httpclient.HttpException;
 public interface HttpRequest {
 
 	/**
-	 * 默认重试次数
-	 * 2016年1月25日 下午4:00:53
+	 * 默认重试次数 2016年1月25日 下午4:00:53
 	 */
 	int DEFAULT_RETRY_COUNT = 3;
 
@@ -28,12 +28,12 @@ public interface HttpRequest {
 	 * @throws HttpException
 	 *             2016年1月18日 下午6:03:33
 	 */
-	 HttpResponseMessage sendRequest(HttpClientFactory httpClientFactory) throws IOException, HttpException;
+	HttpResponseMessage sendRequest(HttpClientFactory httpClientFactory) throws HttpInvokeException;
 
 	/**
 	 * 采用重试发送机制.设置重试次数 2016年1月18日 下午6:03:17
 	 */
-	 HttpRequest setRetryCount(int retryCount);
+	HttpRequest setRetryCount(int retryCount);
 
 	/**
 	 * 添加请求参数，亦或是body的参数
@@ -42,12 +42,11 @@ public interface HttpRequest {
 	 * @param paramValue
 	 * @return 2016年1月19日 下午4:54:30
 	 */
-	 HttpRequest addParameter(String paramName, Object paramValue);
-	 
-	 
-	 Map<String , Object> getParameters();
-	 
-	 Object getParameter(String paramName);
+	HttpRequest addParameter(String paramName, Object paramValue);
+
+	Map<String, Object> getParameters();
+
+	Object getParameter(String paramName);
 
 	/**
 	 * 添加请求头参数
@@ -56,7 +55,7 @@ public interface HttpRequest {
 	 * @param paramValue
 	 * @return 2016年1月19日 下午4:54:30
 	 */
-	 HttpRequest addHeader(String paramName, Object paramValue);
+	HttpRequest addHeader(String paramName, Object paramValue);
 
 	/**
 	 * 移除请求头参数
@@ -64,13 +63,13 @@ public interface HttpRequest {
 	 * @param paramName
 	 * @return 2016年1月19日 下午4:54:38
 	 */
-	 HttpRequest removeHeader(String paramName);
-	
+	HttpRequest removeHeader(String paramName);
+
 	/**
 	 * 获得请求信息
 	 * 
 	 * @return 2016年1月19日 下午3:11:04
 	 */
-	 HttpRequestMessage getRequestMessage();
-	
+	HttpRequestMessage getRequestMessage();
+
 }

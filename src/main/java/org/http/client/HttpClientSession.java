@@ -5,7 +5,7 @@ import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpService;
 import org.http.chain.support.BaseHttpSession;
-import org.http.chain.util.HttpSessionClosedException;
+import org.http.exception.HttpSessionClosedException;
 
 class HttpClientSession extends BaseHttpSession {
 
@@ -37,7 +37,7 @@ class HttpClientSession extends BaseHttpSession {
 	}
 
 	@Override
-	public HttpFilterChain getFilterChain() {
+	public HttpFilterChain getFilterChain() throws HttpSessionClosedException {
 		if(isClose()) {
 			throw new HttpSessionClosedException(getName());
 		}

@@ -5,6 +5,8 @@ import java.util.concurrent.ExecutorService;
 import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpResponseMessage;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpSessionClosedException;
 
 /**
  * HttpClientFilter的处理者 使用多线程处理请求
@@ -25,7 +27,7 @@ class HttpClientFilterProccessor {
 	}
 
 	public HttpResponseMessage doWork(final HttpRequest request, final HttpClientSession session,
-			final HttpClientFactory httpClientFactory) throws Exception {
+			final HttpClientFactory httpClientFactory) throws  HttpSessionClosedException,HttpInvokeException {
 		HttpResponseMessage responseMessage = null;
 		try {
 			responseMessage = request.sendRequest(httpClientFactory);
@@ -34,7 +36,7 @@ class HttpClientFilterProccessor {
 			} else {
 				session.getFilterChain().fireRequestFailed(session, responseMessage);
 			}
-		} catch (Exception e) {
+		} catch (HttpInvokeException e) {
 			session.getFilterChain().fireExceptionCaught(session, e);
 			throw e;
 		} finally {

@@ -4,17 +4,21 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.NoHttpResponseException;
+import org.apache.commons.httpclient.ProtocolException;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -25,19 +29,21 @@ import org.http.HttpRequest;
 import org.http.HttpRequestMessage;
 import org.http.HttpResponseMessage;
 import org.http.chain.support.HttpRetryHandler;
+import org.http.exception.HttpInvokeException;
+import org.http.exception.HttpInvokeException.InvokeErrorCode;
 
 public abstract class BaseHttpRequest implements HttpRequest {
 
 	public static final NameValuePair[] EMPTY_NAMEVALUE_PAIRS = new NameValuePair[] {};
 
 	public static final String DEFAULT_CHARET = "UTF-8";
-	
+
 	protected final String baseUrl;
 
 	/**
 	 * 默认空请求 2016年1月18日 下午5:56:02
 	 */
-	private final HttpRequestMessageImpl requestMessage;
+	private final HttpRequestMessageImpl requestMessage = new HttpRequestMessageImpl();
 
 	/**
 	 * 采用重试机制，重试发送 2016年1月18日 下午6:06:15
@@ -53,23 +59,23 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	/**
 	 * 默认采用非重试机制发送请求
+	 * 
 	 * @param baseUrl
-	 * 2016年1月25日 下午4:07:41
+	 *            2016年1月25日 下午4:07:41
 	 */
 	public BaseHttpRequest(String baseUrl) {
-		this(baseUrl,false);
+		this(baseUrl, false);
 	}
-	
-	public BaseHttpRequest(String baseUrl , boolean isRetry) {
+
+	public BaseHttpRequest(String baseUrl, boolean isRetry) {
 		this.baseUrl = baseUrl;
 		method = innerInitMethod();
-		if(method == null) {
+		if (method == null) {
 			throw new NullPointerException("Implementation class must have method parameter");
 		}
-		if(isRetry) { 
+		if (isRetry) {
 			setRetryCount(DEFAULT_RETRY_COUNT);
 		}
-		requestMessage = new HttpRequestMessageImpl(method, paramBuilder);
 	}
 
 	public HttpRequest setRetryCount(int retryCount) {
@@ -92,7 +98,6 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	@Override
 	public HttpRequest addParameter(String paramName, Object paramValue) {
 		paramBuilder.addParameter(paramName, paramValue);
-		updateRequestMessage();
 		return this;
 	}
 
@@ -109,14 +114,12 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	@Override
 	public HttpRequest addHeader(String paramName, Object paramValue) {
 		method.addRequestHeader(paramName, String.valueOf(paramValue));
-		updateRequestMessage();
 		return this;
 	}
 
 	@Override
 	public HttpRequest removeHeader(String paramName) {
 		method.removeRequestHeader(paramName);
-		updateRequestMessage();
 		return this;
 	}
 
@@ -130,7 +133,6 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	protected void initRetry(HttpMethod method, int retryCount) {
 		if (getRetryCount() > 0) {
 			method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new HttpRetryHandler(retryCount));
-			updateRequestMessage();
 		}
 	}
 
@@ -141,46 +143,51 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	 */
 	private HttpRequest prepareRequest() {
 		prepareRequest(method, buildNameValuePair(paramBuilder.getParameters()));
-		
-		updateRequestMessage();
-		
+
 		paramBuilder.clear();
 		return this;
 	}
 
 	/**
-	 * 更新信息
-	 * 2016年1月20日 下午4:35:45
-	 */
-	private void updateRequestMessage() {
-		requestMessage.update(method, paramBuilder);
-	}
-
-	/**
 	 * 准备请求的具体实现
+	 * 
 	 * @param method
 	 * @param nameValuePairs
-	 * 2016年1月20日 下午4:38:56
+	 *            2016年1月20日 下午4:38:56
 	 */
 	protected void prepareRequest(HttpMethod method, NameValuePair[] nameValuePairs) {
 		method.setQueryString(nameValuePairs);
 	}
 
 	@Override
-	public HttpResponseMessage sendRequest(HttpClientFactory httpClientFactory) throws IOException, HttpException {
+	public HttpResponseMessage sendRequest(HttpClientFactory httpClientFactory) throws HttpInvokeException {
 		HttpClient httpClient = httpClientFactory.getConnection();
 		if (httpClientFactory == null || httpClient == null) {
-			throw new IOException("httpClientFacotry is Null");
+			throw new NullPointerException("httpClientFacotry is null");
 		}
-		
+
 		prepareRequest();
 
-		/**
-		 * 执行方法
-		 */
-		httpClient.executeMethod(method);
 		try {
+			/**
+			 * 执行方法
+			 */
+			httpClient.executeMethod(method);
 			return new HttpResponseImpl(method);
+		} catch (HttpException e) {
+			if (e instanceof ProtocolException) {
+				throw new HttpInvokeException(InvokeErrorCode.HTTP_PROTOCOL_INVAILD, e);
+			}
+			throw new HttpInvokeException(InvokeErrorCode.UNKONW_HTTP_EXCEPTION, e);
+		} catch (IOException e) {
+			if (e instanceof SocketTimeoutException) {
+				throw new HttpInvokeException(InvokeErrorCode.SOCKET_CONNECT_TIME_OUT, e);
+			} else if (e instanceof ConnectTimeoutException) {
+				throw new HttpInvokeException(InvokeErrorCode.CONNECT_TIME_OUT, e);
+			} else if (e instanceof NoHttpResponseException) {
+				throw new HttpInvokeException(InvokeErrorCode.NO_HTTP_RESPONSE, e);
+			}
+			throw new HttpInvokeException(InvokeErrorCode.UNKONW_IO_EXCEPTION, e);
 		} finally {
 			method.releaseConnection();
 		}
@@ -293,18 +300,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	protected class HttpRequestMessageImpl implements HttpRequestMessage {
 
-		private HttpMethod method;
-
-		private ParamBuilder paramBuilder;
-
-		void update(HttpMethod method, ParamBuilder paramBuilder) {
-			this.method = method;
-			this.paramBuilder = paramBuilder;
-		}
-		
-
-		public HttpRequestMessageImpl(HttpMethod method, ParamBuilder paramBuilder) {
-			update(method, paramBuilder);
+		public HttpRequestMessageImpl() {
 		}
 
 		@Override
