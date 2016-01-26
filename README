@@ -1,14 +1,21 @@
-# 0.0.1 Version
+#引言
+	0.0开头的版本都属于测试升级版本
+
+## 0.0.1 Version
 	1.使用reactor模式进行封装commons-httpclient3.1版本，并通过同步处理handler和异步处理filter的机制来处理扩展的功能
 	2.当调用session.close()方法时会抛出HttpSessionClosedException,业务端需要特殊处理该异常，意义在于http连接被强制关闭
 	
-# 0.0.2 Version
+## 0.0.2 Version
 	1.上一版本对异常未做特殊处理，这一版本给封装了HttpInvokeException[http异常包装器]，并针对每个异常都有相应code对应
 	2.修改HttpSessionClosedException为HttpInvokeException的子类，并其对应的code为SESSION_CLOSE
 	
-# 0.0.3 Version
+## 0.0.3 Version
 	1.新增HttpResponseProcessException，为HttpInvokeException的子类，并添加其对应的code为HTTP_RESPONSE_PROCESS
 	2.将HttpResponseProcessor声明抛出的异常为HttpResponseProcessException
 	3.给filter异步调用的session加上锁，使其在每个session之间能够顺序执行
 	4.修改HttpService的close方法为release方法，一般不建议使用release方法，此操作时不可逆的
 	5.删除HttpSession中的getService方法,以前关系未理清，request属于session管理的，但是session是基于service生存的
+	
+## 0.0.4 Version
+	1.修改HttpResponseProcessor接口为泛型，将其原先方法的Class<T> clazz参数删除
+	2.修改HttpJsonProcessor为抽象类，并添加JavaObjectProcessor的实现类
