@@ -19,3 +19,7 @@
 ## 0.0.4 Version
 	1.修改HttpResponseProcessor接口为泛型，将其原先方法的Class<T> clazz参数删除
 	2.修改HttpJsonProcessor为抽象类，并添加JavaObjectProcessor的实现类
+	
+## 0.0.5 Version
+	1.修改了HttpInvokeException的setErrorCode方法为protected类型
+	2.添加HttpJsonProcessor的日志记录，记录返回的json数据格式

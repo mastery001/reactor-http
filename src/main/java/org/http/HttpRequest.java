@@ -36,34 +36,45 @@ public interface HttpRequest {
 	HttpRequest setRetryCount(int retryCount);
 
 	/**
-	 * 添加请求参数，亦或是body的参数
-	 * 
+	 * 添加请求参数
+	 * 当添加的value为null时不做添加操作
 	 * @param paramName
 	 * @param paramValue
 	 * @return 2016年1月19日 下午4:54:30
 	 */
 	HttpRequest addParameter(String paramName, Object paramValue);
 
+	/**
+	 * 获得所有的参数
+	 * @return
+	 * 2016年1月27日 下午3:39:05
+	 */
 	Map<String, Object> getParameters();
 
+	/**
+	 * 获得对应paramName对应的值
+	 * @param paramName
+	 * @return
+	 * 2016年1月27日 下午3:39:12
+	 */
 	Object getParameter(String paramName);
 
 	/**
 	 * 添加请求头参数
 	 * 
-	 * @param paramName
-	 * @param paramValue
+	 * @param headerName
+	 * @param headerValue
 	 * @return 2016年1月19日 下午4:54:30
 	 */
-	HttpRequest addHeader(String paramName, Object paramValue);
+	HttpRequest addHeader(String headerName, Object headerValue);
 
 	/**
 	 * 移除请求头参数
 	 * 
-	 * @param paramName
+	 * @param headerName
 	 * @return 2016年1月19日 下午4:54:38
 	 */
-	HttpRequest removeHeader(String paramName);
+	HttpRequest removeHeader(String headerName);
 
 	/**
 	 * 获得请求信息

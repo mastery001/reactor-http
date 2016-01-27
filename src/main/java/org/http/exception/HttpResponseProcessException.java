@@ -14,6 +14,11 @@ public class HttpResponseProcessException extends HttpInvokeException {
 	 */
 	private static final long serialVersionUID = 553965611660221706L;
 
+	public HttpResponseProcessException(String message) {
+		super(message);
+		setErrorCode(InvokeErrorCode.HTTP_RESPONSE_PROCESS);
+	}
+
 	public HttpResponseProcessException(Throwable cause) {
 		super(InvokeErrorCode.HTTP_RESPONSE_PROCESS, cause);
 	}

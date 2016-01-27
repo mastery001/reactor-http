@@ -16,32 +16,34 @@ public class HttpInvokeException extends Exception {
 	private static final long serialVersionUID = -536087228129046605L;
 
 	private InvokeErrorCode errorCode;
-
+	
 	protected HttpInvokeException() {
+		setErrorCode(InvokeErrorCode.CUSTOM_EXCEPTION);
+	}
+	
+	protected HttpInvokeException(String message) {
+		super(message);
 	}
 
 	public HttpInvokeException(Throwable cause) {
-		this(InvokeErrorCode.CUSTOM_EXCEPTION, cause);
+		super(cause);
 	}
 
 	public HttpInvokeException(InvokeErrorCode errorCode, Throwable cause) {
 		super(cause.getMessage(), cause);
-		this.errorCode = errorCode;
+		if(errorCode != null) {
+			setErrorCode(errorCode);
+		}
 	}
 
-	public void setErrorCode(InvokeErrorCode errorCode) {
+	protected void setErrorCode(InvokeErrorCode errorCode) {
 		this.errorCode = errorCode;
 	}
 
 	public InvokeErrorCode getErrorCode() {
 		return errorCode;
 	}
-
-	@Override
-	public String getMessage() {
-		return "errorCode is : " + errorCode + "{" + errorCode.mesage + "},concrete message is " + super.getMessage();
-	}
-
+	
 	/**
 	 * http调用时出现的错误代码
 	 * 

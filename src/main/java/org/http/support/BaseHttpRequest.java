@@ -96,7 +96,9 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpRequest addParameter(String paramName, Object paramValue) {
-		paramBuilder.addParameter(paramName, paramValue);
+		if(paramValue != null) {
+			paramBuilder.addParameter(paramName, paramValue);
+		}
 		return this;
 	}
 
@@ -111,14 +113,19 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	}
 
 	@Override
-	public HttpRequest addHeader(String paramName, Object paramValue) {
-		method.addRequestHeader(paramName, String.valueOf(paramValue));
+	public HttpRequest addHeader(String headerName, Object headerValue) {
+		if(headerValue != null) {
+			method.addRequestHeader(headerName, String.valueOf(headerValue));
+		}
 		return this;
 	}
 
 	@Override
-	public HttpRequest removeHeader(String paramName) {
-		method.removeRequestHeader(paramName);
+	public HttpRequest removeHeader(String headerName) {
+		if(method.getRequestHeader(headerName) != null) {
+			method.removeRequestHeader(headerName);
+		}
+		
 		return this;
 	}
 
