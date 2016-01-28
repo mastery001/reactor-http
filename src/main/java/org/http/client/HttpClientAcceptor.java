@@ -70,7 +70,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 			httpClientFactory = HttpClientFactory.DEFAULT_FACTORY;
 		}
 		this.httpClientFactory = httpClientFactory;
-		filterChain = new HttpClientFilterChain(executor);
+		filterChain = new HttpClientFilterChain();
 		this.executor = executor;
 		this.processorCount = processorCount;
 		httpProcessor = new HttpClientFilterProccessor[this.processorCount];
@@ -84,7 +84,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 	protected HttpResponseMessage doService(HttpRequest request, HttpHandler handler, HttpSession session)
 			 throws HttpSessionClosedException, HttpInvokeException {
 		HttpClientSession clientSession = (HttpClientSession) session;
-		return clientSession.getProcessor().doWork(request, clientSession, httpClientFactory);
+		return clientSession.getProcessor().doWork(request, clientSession, httpClientFactory,handler);
 	}
 
 	@Override
@@ -106,7 +106,6 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 		} catch (Exception e) {
 			ExceptionMonitor.getInstance().exceptionCaught(e);
 		}
-		session.getFilterChain().fireSessionCreated(session);
 		return session;
 	}
 

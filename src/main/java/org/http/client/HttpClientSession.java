@@ -5,7 +5,6 @@ import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpService;
 import org.http.chain.support.BaseHttpSession;
-import org.http.exception.HttpSessionClosedException;
 
 class HttpClientSession extends BaseHttpSession {
 
@@ -18,6 +17,8 @@ class HttpClientSession extends BaseHttpSession {
 	private final HttpHandler handler;
 
 	private final HttpClientFilterProccessor filterProcessor;
+	
+	private Object attachment;
 
 	public HttpClientSession(HttpService service, HttpRequest httpRequest,
 			HttpClientFilterProccessor filterProcessor, HttpHandler handler, HttpFilterChain filterChain) {
@@ -25,9 +26,6 @@ class HttpClientSession extends BaseHttpSession {
 		this.httpRequest = httpRequest;
 		this.filterChain = filterChain;
 		this.filterProcessor = filterProcessor;
-		if(handler == null) {
-			handler = HttpClientFilterChain.DefaultHandler;
-		}
 		this.handler = handler;
 	}
 
@@ -37,10 +35,7 @@ class HttpClientSession extends BaseHttpSession {
 	}
 
 	@Override
-	public HttpFilterChain getFilterChain() throws HttpSessionClosedException {
-		if(isClose()) {
-			throw new HttpSessionClosedException(getName());
-		}
+	public HttpFilterChain getFilterChain(){
 		return filterChain;
 	}
 
@@ -65,5 +60,29 @@ class HttpClientSession extends BaseHttpSession {
 	@Override
 	public String getName() {
 		return getRequest().getRequestMessage().getURL();
+	}
+	
+	/**
+	 * 每个session可携带一个附件传递
+	 * @param attachment
+	 * @return
+	 * 2016年1月28日 上午9:38:26
+	 */
+	Object setAttachment(Object attachment){
+		Object oldAttachment = null;
+		if(this.attachment != null) {
+			oldAttachment = this.attachment;
+		}
+		this.attachment = attachment;
+		return oldAttachment;
+	}
+	
+	/**
+	 * 得到当前的附件
+	 * @return
+	 * 2016年1月28日 上午9:38:41
+	 */
+	Object getAttachment(){
+		return attachment;
 	}
 }

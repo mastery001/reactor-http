@@ -18,7 +18,7 @@ public interface HttpAcceptor {
 	 * 
 	 * @param request
 	 * @return
-	 * @throws HttpSessionClosedException   请求强制关闭的异常
+	 * @throws HttpSessionClosedException   可能抛出请求强制关闭的异常	
 	 * @throws HttpInvokeException			请求调用时产生的异常
 	 *             2016年1月18日 下午8:02:53
 	 */

@@ -8,12 +8,12 @@ import org.http.chain.HttpSession;
 public abstract class BaseHttpSession implements HttpSession {
 
 	private final Map<String, Object> attributes = new HashMap<String, Object>(8);
-
+	
 	private final long createTime;
 
 	private long lastAccessedTime;
 
-	private boolean close;
+	private volatile boolean close;
 
 	public BaseHttpSession() {
 		createTime = lastAccessedTime = System.currentTimeMillis();

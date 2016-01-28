@@ -44,7 +44,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>log.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
 			<version>1.7.1</version>
@@ -63,7 +63,7 @@
 			<groupId>log.logback</groupId>
 			<artifactId>classic</artifactId>
 			<version>1.0.7</version>
-		</dependency>
+		</dependency>  -->
 
 		<dependency>
 			<groupId>org.slf4j</groupId>

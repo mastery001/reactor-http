@@ -16,9 +16,7 @@ public class NamePreservingRunnable implements Runnable {
 
     public void run() {
         Thread currentThread = Thread.currentThread();
-        if(!currentThread.isAlive()) {
-        	currentThread.setDaemon(true);
-        }
+        
         String oldName = currentThread.getName();
         
         if (newName != null) {
