@@ -25,3 +25,4 @@
 	2.添加HttpJsonProcessor的日志记录，记录返回的json数据格式
 	3.在HttpClientSession中加入setAttachment和getAttachment方法，用于添加附件
 	4.每次发送请求时产生的异步请求由每个事件都产生一个线程来处理
+	5.添加HttpClientAcceptor(HttpClientFactory httpClientFactory)构造方法

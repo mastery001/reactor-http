@@ -4,6 +4,8 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.http.chain.HttpFilterAdapter;
 import org.http.chain.HttpSession;
 import org.http.client.HttpClientAcceptor;
@@ -13,7 +15,20 @@ import org.junit.Test;
 
 public class HttpAcceptorTest {
 
-	final static HttpClientAcceptor client = new HttpClientAcceptor();
+	final static HttpClientAcceptor client = new HttpClientAcceptor(new HttpClientFactory() {
+
+		@Override
+		public HttpClient getConnection() {
+			MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
+			connectionManager.getParams().setConnectionTimeout(1500);
+			connectionManager.getParams().setSoTimeout(4000);
+			connectionManager.getParams().setDefaultMaxConnectionsPerHost(5);
+			HttpClient httpClient = new HttpClient(connectionManager);
+			httpClient.getHostConfiguration().setProxy("123.125.65.82", 80);
+			return httpClient;
+		}
+		
+	});
 	
 	public static void main(String[] args) throws InterruptedException {
 		HttpAcceptorTest test = new HttpAcceptorTest();
@@ -37,7 +52,7 @@ public class HttpAcceptorTest {
 
 		});
 		long start = System.currentTimeMillis();
-		int count = 1000;
+		int count = 100000000;
 		CountDownLatch c = new CountDownLatch(count);
 		for (int i = 0; i < count; i++) {
 			new Thread(test.new Request(c,i)).start();

@@ -61,6 +61,10 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 	public HttpClientAcceptor() {
 		this(null, 1, Executors.newCachedThreadPool());
 	}
+	
+	public HttpClientAcceptor(HttpClientFactory httpClientFactory) {
+		this(httpClientFactory, 1, Executors.newCachedThreadPool());
+	}
 
 	public HttpClientAcceptor(HttpClientFactory httpClientFactory, int processorCount, ExecutorService executor) {
 		if (processorCount < 1) {
@@ -68,6 +72,9 @@ public class HttpClientAcceptor extends BaseHttpAcceptor {
 		}
 		if (httpClientFactory == null) {
 			httpClientFactory = HttpClientFactory.DEFAULT_FACTORY;
+		}
+		if(executor == null) {
+			executor = Executors.newCachedThreadPool();
 		}
 		this.httpClientFactory = httpClientFactory;
 		filterChain = new HttpClientFilterChain();
