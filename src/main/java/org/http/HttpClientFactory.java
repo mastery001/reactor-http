@@ -20,7 +20,7 @@ public interface HttpClientFactory {
 		
 		{
 			MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-			connectionManager.getParams().setConnectionTimeout(1500);
+			connectionManager.getParams().setConnectionTimeout(1000);
 			connectionManager.getParams().setSoTimeout(4000);
 			connectionManager.getParams().setDefaultMaxConnectionsPerHost(5);
 			httpClient = new HttpClient(connectionManager);
