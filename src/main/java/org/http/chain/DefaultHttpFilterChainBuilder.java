@@ -10,24 +10,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.http.chain.HttpFilter.NextHttpFilter;
 import org.http.chain.HttpFilterChain.Entry;
 
-@SuppressWarnings({"rawtypes","unchecked"})
 public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 
-	private final List entries;
+	private final List<Entry> entries;
 
 	/**
 	 * Creates a new instance with an empty filter list.
 	 */
 	public DefaultHttpFilterChainBuilder() {
-		entries = new CopyOnWriteArrayList();
+		entries = new CopyOnWriteArrayList<Entry>();
 	}
 	
 	/**
 	 * @see HttpFilterChain#getEntry(String)
 	 */
 	public Entry getEntry(String name) {
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			if (e.getName().equals(name)) {
 				return e;
 			}
@@ -51,15 +50,15 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	/**
 	 * @see HttpFilterChain#getAll()
 	 */
-	public List getAll() {
-		return new ArrayList(entries);
+	public List<Entry> getAll() {
+		return new ArrayList<Entry>(entries);
 	}
 
 	/**
 	 * @see HttpFilterChain#getAllReversed()
 	 */
-	public List getAllReversed() {
-		List result = getAll();
+	public List<Entry> getAllReversed() {
+		List<Entry> result = getAll();
 		Collections.reverse(result);
 		return result;
 	}
@@ -75,8 +74,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	 * @see HttpFilterChain#contains(HttpFilter)
 	 */
 	public boolean contains(HttpFilter filter) {
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			if (e.getFilter() == filter) {
 				return true;
 			}
@@ -88,9 +87,9 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	/**
 	 * @see HttpFilterChain#contains(Class)
 	 */
-	public boolean contains(Class filterType) {
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+	public boolean contains(Class<?> filterType) {
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			if (filterType.isAssignableFrom(e.getFilter().getClass())) {
 				return true;
 			}
@@ -119,8 +118,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	public synchronized void addBefore(String baseName, String name, HttpFilter filter) {
 		checkBaseName(baseName);
 
-		for (ListIterator i = entries.listIterator(); i.hasNext();) {
-			Entry base = (Entry) i.next();
+		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+			Entry base =  i.next();
 			if (base.getName().equals(baseName)) {
 				register(i.previousIndex(), new EntryImpl(name, filter));
 				break;
@@ -134,8 +133,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	public synchronized void addAfter(String baseName, String name, HttpFilter filter) {
 		checkBaseName(baseName);
 
-		for (ListIterator i = entries.listIterator(); i.hasNext();) {
-			Entry base = (Entry) i.next();
+		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+			Entry base =  i.next();
 			if (base.getName().equals(baseName)) {
 				register(i.nextIndex(), new EntryImpl(name, filter));
 				break;
@@ -151,8 +150,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 			throw new NullPointerException("name");
 		}
 
-		for (ListIterator i = entries.listIterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+			Entry e =  i.next();
 			if (e.getName().equals(name)) {
 				entries.remove(i.previousIndex());
 				return e.getFilter();
@@ -170,8 +169,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 	}
 
 	public void buildFilterChain(HttpFilterChain chain) throws Exception {
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			chain.addLast(e.getName(), e.getFilter());
 		}
 	}
@@ -182,8 +181,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 
 		boolean empty = true;
 
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			if (!empty) {
 				buf.append(", ");
 			} else {
@@ -208,8 +207,8 @@ public class DefaultHttpFilterChainBuilder implements HttpFilterChainBuilder {
 
 	public Object clone() {
 		DefaultHttpFilterChainBuilder ret = new DefaultHttpFilterChainBuilder();
-		for (Iterator i = entries.iterator(); i.hasNext();) {
-			Entry e = (Entry) i.next();
+		for (Iterator<Entry> i = entries.iterator(); i.hasNext();) {
+			Entry e =  i.next();
 			ret.addLast(e.getName(), e.getFilter());
 		}
 		return ret;

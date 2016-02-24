@@ -1,6 +1,6 @@
 package org.http.client;
 
-import org.http.HttpRequest;
+import org.http.HttpRequestMessage;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpService;
@@ -10,28 +10,27 @@ class HttpClientSession extends BaseHttpSession {
 
 	private final HttpService service;
 
-	private final HttpRequest httpRequest;
+	private final HttpRequestMessage httpRequestMessage;
 
 	private final HttpFilterChain filterChain;
 
 	private final HttpHandler handler;
 
-	private final HttpClientFilterProccessor filterProcessor;
+//	private final HttpClientProccessor filterProcessor;
 	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequest httpRequest,
-			HttpClientFilterProccessor filterProcessor, HttpHandler handler, HttpFilterChain filterChain) {
+	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler, HttpFilterChain filterChain) {
 		this.service = service;
-		this.httpRequest = httpRequest;
+		this.httpRequestMessage = httpRequestMessage;
 		this.filterChain = filterChain;
-		this.filterProcessor = filterProcessor;
+//		this.filterProcessor = filterProcessor;
 		this.handler = handler;
 	}
 
 	@Override
-	public HttpRequest getRequest() {
-		return httpRequest;
+	public HttpRequestMessage getRequestMessage() {
+		return httpRequestMessage;
 	}
 
 	@Override
@@ -48,9 +47,9 @@ class HttpClientSession extends BaseHttpSession {
 		return handler;
 	}
 
-	HttpClientFilterProccessor getProcessor() {
-		return this.filterProcessor;
-	}
+//	HttpClientProccessor getProcessor() {
+//		return this.filterProcessor;
+//	}
 
 	@Override
 	protected void close0() {
@@ -59,7 +58,7 @@ class HttpClientSession extends BaseHttpSession {
 
 	@Override
 	public String getName() {
-		return getRequest().getRequestMessage().getURL();
+		return getRequestMessage().getURL();
 	}
 	
 	/**

@@ -62,6 +62,11 @@ public interface HttpRequestMessage {
 		public Map<String, Object> getParameters() {
 			return map;
 		}
+
+		@Override
+		public String getCompleteUrl() {
+			return "";
+		}
 		
 	};
 	
@@ -94,6 +99,14 @@ public interface HttpRequestMessage {
 	 */
 	String getURL();
 
+	/**
+	 * 获取完整的url
+	 * 由getURL()和其所有的参数构成
+	 * @return
+	 * 2016年2月24日 下午3:56:27
+	 */
+	String getCompleteUrl();
+	
 	/**
 	 * 对应的请求头
 	 * @param headerName

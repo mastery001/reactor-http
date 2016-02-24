@@ -3,8 +3,6 @@ package org.http.support.processor;
 import org.http.HttpResponseMessage;
 import org.http.HttpResponseProcessor;
 import org.http.exception.HttpResponseProcessException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +20,6 @@ public abstract class HttpJsonProcessor<T> implements HttpResponseProcessor<T> {
 		if (response != null) {
 			try {
 				JSONObject resultJsonObject = JSON.parseObject(response.getContent());
-				getLogger().info("return json is : " + resultJsonObject);
 				return innerHandleResponse(resultJsonObject);
 			} catch (HttpResponseProcessException e) {
 				throw e;
@@ -43,7 +40,4 @@ public abstract class HttpJsonProcessor<T> implements HttpResponseProcessor<T> {
 	 */
 	protected abstract T innerHandleResponse(JSONObject resultJsonObject) throws Exception;
 
-	private Logger getLogger() {
-		return LoggerFactory.getLogger(this.getClass());
-	}
 }

@@ -4,7 +4,8 @@ import org.http.HttpResponseMessage;
 
 /**
  * http的处理过滤的适配器
- * @Notes 由于调用HttpFilter是异步调用HttpFilter的实现最好是线程安全的
+ * 在0.0.5（包括0.0.5）版本之前调用filter是属于异步调用的，之后的版本将filter的调用修改为同步调用
+ * @Notes # 由于调用HttpFilter是异步调用HttpFilter的实现最好是线程安全的
  * @author zouziwen
  *
  * 2016年1月20日 下午7:53:16

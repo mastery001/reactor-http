@@ -2,7 +2,6 @@ package org.http;
 
 import static org.junit.Assert.fail;
 
-import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -12,6 +11,7 @@ import org.http.chain.HttpSession;
 import org.http.client.HttpClientAcceptor;
 import org.http.client.method.HttpGetRequest;
 import org.http.exception.HttpInvokeException;
+import org.http.filter.LoggerFilter;
 import org.junit.Test;
 
 public class HttpAcceptorTest {
@@ -21,7 +21,7 @@ public class HttpAcceptorTest {
 		@Override
 		public HttpClient getConnection() {
 			MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-			connectionManager.getParams().setConnectionTimeout(1500);
+			connectionManager.getParams().setConnectionTimeout(1000);
 			connectionManager.getParams().setSoTimeout(4000);
 			connectionManager.getParams().setDefaultMaxConnectionsPerHost(5);
 			HttpClient httpClient = new HttpClient(connectionManager);
@@ -33,6 +33,7 @@ public class HttpAcceptorTest {
 	
 	public static void main(String[] args) throws InterruptedException {
 		HttpAcceptorTest test = new HttpAcceptorTest();
+		client.getFilterChain().addLast("loggerFilter", new LoggerFilter());
 		client.getFilterChain().addLast("test", new HttpFilterAdapter() {
 
 			@Override
@@ -41,6 +42,7 @@ public class HttpAcceptorTest {
 //				for (int i = 1; i < 20; i++) {
 //					sum = sum.multiply(BigDecimal.valueOf(i));
 //				}
+				//TimeUnit.SECONDS.sleep(2);
 				session.setAttribute("11", 1);
 			}
 
@@ -54,7 +56,7 @@ public class HttpAcceptorTest {
 
 		});
 		long start = System.currentTimeMillis();
-		int count = 10000000;
+		int count = 1;
 		CountDownLatch c = new CountDownLatch(count);
 		for (int i = 0; i < count; i++) {
 			new Thread(test.new Request(c,i)).start();
@@ -77,7 +79,9 @@ public class HttpAcceptorTest {
 		
 		@Override
 		public void run() {
-			HttpGetRequest request = new HttpGetRequest("http://www.baidu.com/s?wd=" + i , true);
+			HttpGetRequest request = new HttpGetRequest("http://www.baidu.com/s" , true);
+			request.addParameter("wd", "ceshi" + i);
+			request.addParameter("ie", "utf-8");
 			try {
 				client.service(request);
 			} catch (HttpInvokeException e) {

@@ -26,3 +26,9 @@
 	3.在HttpClientSession中加入setAttachment和getAttachment方法，用于添加附件
 	4.每次发送请求时产生的异步请求由每个事件都产生一个线程来处理
 	5.添加HttpClientAcceptor(HttpClientFactory httpClientFactory)构造方法
+	
+## 0.0.6 Version
+	1.将HttpFilter的异步执行方式改成同步执行
+	2.添加了AsyncHttpClientAcceptor的http访问器，用于异步调用http请求
+	3.添加日志过滤器，专门负责记录日志
+	4.HttpRequestMessage中添加getCompleteUrl方法用于获取加上查询参数的完整路径

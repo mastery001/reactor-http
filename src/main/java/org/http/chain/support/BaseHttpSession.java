@@ -26,11 +26,12 @@ public abstract class BaseHttpSession implements HttpSession {
 
 	@Override
 	public long getLastAccessedTime() {
+		updateLastAccessedTime();
 		return lastAccessedTime;
 	}
 
-	public void setLastAccessedTime(long lastAccessedTime) {
-		this.lastAccessedTime = lastAccessedTime;
+	public void updateLastAccessedTime() {
+		this.lastAccessedTime = System.currentTimeMillis();
 	}
 
 	@Override

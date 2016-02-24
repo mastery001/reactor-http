@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestMessage;
 import org.http.HttpResponseMessage;
+import org.http.chain.util.Constant;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
 
@@ -96,7 +98,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpRequest addParameter(String paramName, Object paramValue) {
-		if(paramValue != null) {
+		if (paramValue != null) {
 			paramBuilder.addParameter(paramName, paramValue);
 		}
 		return this;
@@ -114,7 +116,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpRequest addHeader(String headerName, Object headerValue) {
-		if(headerValue != null) {
+		if (headerValue != null) {
 			method.addRequestHeader(headerName, String.valueOf(headerValue));
 		}
 		return this;
@@ -122,10 +124,10 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpRequest removeHeader(String headerName) {
-		if(method.getRequestHeader(headerName) != null) {
+		if (method.getRequestHeader(headerName) != null) {
 			method.removeRequestHeader(headerName);
 		}
-		
+
 		return this;
 	}
 
@@ -150,7 +152,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	private HttpRequest prepareRequest() {
 		prepareRequest(method, buildNameValuePair(paramBuilder.getParameters()));
 
-		paramBuilder.clear();
+		// paramBuilder.clear();
 		return this;
 	}
 
@@ -354,6 +356,29 @@ public abstract class BaseHttpRequest implements HttpRequest {
 			return paramBuilder.getParameters();
 		}
 
+		@Override
+		public String getCompleteUrl() {
+			StringBuilder urlBuilder = new StringBuilder();
+			urlBuilder.append(getBaseUrl());
+			String join = Constant.INTERROGATION;
+			Map<String, Object> map = getParameters();
+			Iterator<String> it = map.keySet().iterator();
+			String key = it.next();
+			// if have ?
+			if (urlBuilder.indexOf(Constant.INTERROGATION) == -1) {
+				urlBuilder.append(join).append(key).append(Constant.EQUAL).append(map.get(key));
+				join = Constant.AND;
+			}
+			while (it.hasNext()) {
+				key = it.next();
+				urlBuilder.append(join).append(key).append(Constant.EQUAL).append(map.get(key));
+			}
+			if (join.equals(Constant.INTERROGATION) && !it.hasNext()) {
+				urlBuilder.append(Constant.AND).append(key).append(Constant.EQUAL).append(map.get(key));
+			}
+			return urlBuilder.toString();
+		}
+
 	}
 
 	/**
@@ -379,6 +404,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 			return params;
 		}
 
+		@SuppressWarnings("unused")
 		public ParamBuilder clear() {
 			params.clear();
 			return this;

@@ -11,7 +11,7 @@ import org.http.exception.HttpSessionClosedException;
  *
  *         2016年1月20日 下午2:05:22
  */
-public interface HttpAcceptor {
+public interface HttpAcceptor<T> {
 
 	/**
 	 * 处理请求的根方法
@@ -22,7 +22,7 @@ public interface HttpAcceptor {
 	 * @throws HttpInvokeException			请求调用时产生的异常
 	 *             2016年1月18日 下午8:02:53
 	 */
-	HttpResponseMessage service(HttpRequest request) throws HttpSessionClosedException, HttpInvokeException;
+	T service(HttpRequest request) throws HttpSessionClosedException, HttpInvokeException;
 
 	/**
 	 * 针对单个http请求的个性化操作
@@ -35,6 +35,6 @@ public interface HttpAcceptor {
 	 * @throws HttpInvokeException			请求调用时产生的异常
 	 *             2016年1月19日 下午5:03:23
 	 */
-	HttpResponseMessage service(HttpRequest request, HttpHandler handler)
+	T service(HttpRequest request, HttpHandler handler)
 			throws HttpSessionClosedException, HttpInvokeException;
 }

@@ -1,6 +1,6 @@
 package org.http.chain;
 
-import org.http.HttpRequest;
+import org.http.HttpRequestMessage;
 
 /**
  * 每个请求会有一个独立的session
@@ -31,7 +31,7 @@ public interface HttpSession {
 	 * @return
 	 * 2016年1月20日 下午5:18:17
 	 */
-	HttpRequest getRequest();
+	HttpRequestMessage getRequestMessage();
 
 	/**
 	 * 主动关闭session的连接，即停止http请求 2016年1月20日 上午10:52:54

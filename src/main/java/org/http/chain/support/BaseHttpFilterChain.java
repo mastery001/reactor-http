@@ -326,28 +326,53 @@ public abstract class BaseHttpFilterChain implements HttpFilterChain {
 
 	private static class TailHttpFilter extends HttpFilterAdapter {
 		public void sessionCreated(NextHttpFilter nextHttpFilter, HttpSession session) throws Exception {
-			// session.getHandler().sessionCreated(session , requestMessage);
+			if (haveHandler(session)) {
+				session.getHandler().sessionCreated(session);
+			}
+
 		}
 
 		public void sessionClosed(NextHttpFilter nextHttpFilter, HttpSession session) throws Exception {
-			// session.getHandler().sessionClosed(session);
+			if (haveHandler(session)) {
+				session.getHandler().sessionClosed(session);
+			}
+
 		}
 
 		public void exceptionCaught(NextHttpFilter nextHttpFilter, HttpSession session, Throwable cause)
 				throws Exception {
-			// session.getHandler().exceptionCaught(session, cause);
+			if (haveHandler(session)) {
+				session.getHandler().exceptionCaught(session, cause);
+			}
+
 		}
 
 		@Override
 		public void requestFailed(NextHttpFilter nextFilter, HttpSession session, HttpResponseMessage responseMessage)
 				throws Exception {
-			// session.getHandler().requestFailed(session, responseMessage);
+			if (haveHandler(session)) {
+				session.getHandler().requestFailed(session, responseMessage);
+			}
+
 		}
 
 		@Override
 		public void requestSuccessed(NextHttpFilter nextFilter, HttpSession session,
 				HttpResponseMessage responseMessage) throws Exception {
-			// session.getHandler().requestSuccessed(session, responseMessage);
+			if (haveHandler(session)) {
+				session.getHandler().requestSuccessed(session, responseMessage);
+			}
+
+		}
+
+		/**
+		 * 当不为空返回true
+		 * @param session
+		 * @return
+		 * 2016年2月24日 下午4:49:39
+		 */
+		private boolean haveHandler(HttpSession session) {
+			return session.getHandler() != null;
 		}
 
 	}

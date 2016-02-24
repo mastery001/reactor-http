@@ -17,7 +17,7 @@ import org.http.exception.HttpSessionClosedException;
  *
  * 2016年1月20日 上午11:24:51
  */
-public class HttpDelegate implements HttpAcceptor{
+public class HttpDelegate implements HttpAcceptor<HttpResponseMessage>{
 
 	public static final HttpDelegate Proxy = new HttpDelegate();
 	
