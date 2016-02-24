@@ -34,7 +34,9 @@ public interface HttpSession {
 	HttpRequestMessage getRequestMessage();
 
 	/**
-	 * 主动关闭session的连接，即停止http请求 2016年1月20日 上午10:52:54
+	 * 主动关闭session的连接，即停止http请求 
+	 * 	该事件最好在sessionCreated时触发，其他事件情况下可能不理会
+	 * 2016年1月20日 上午10:52:54
 	 */
 	void close();
 

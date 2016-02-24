@@ -32,3 +32,4 @@
 	2.添加了AsyncHttpClientAcceptor的http访问器，用于异步调用http请求
 	3.添加日志过滤器，专门负责记录日志
 	4.HttpRequestMessage中添加getCompleteUrl方法用于获取加上查询参数的完整路径
+	5.添加检验session关闭的功能

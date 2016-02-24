@@ -30,6 +30,7 @@ abstract class HttpFilterProcessor<T> {
 	protected HttpResponseMessage doWork0(HttpRequest request, HttpClientSession session,
 			HttpClientFactory httpClientFactory) throws HttpSessionClosedException, HttpInvokeException {
 		session.getFilterChain().fireSessionCreated(session);
+		checkSessionClose(session);
 		HttpResponseMessage responseMessage = null;
 		try {
 			responseMessage = request.sendRequest(httpClientFactory);
@@ -47,4 +48,17 @@ abstract class HttpFilterProcessor<T> {
 		}
 		return responseMessage;
 	}
+	
+	/**
+	 * 检查请求是否关闭
+	 * @param session
+	 * @throws HttpSessionClosedException
+	 * 2016年2月24日 下午5:34:16
+	 */
+	void checkSessionClose(HttpClientSession session) throws HttpSessionClosedException {
+		if (session.isClose()) {
+			throw new HttpSessionClosedException(session.getName());
+		}
+	}
+
 }
