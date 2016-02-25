@@ -3,7 +3,6 @@ package org.http.client;
 import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpResponseMessage;
-import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
@@ -19,7 +18,7 @@ import org.http.support.BaseHttpAcceptor;
  */
 public class HttpClientAcceptor extends BaseHttpAcceptor<HttpResponseMessage> {
 
-	protected HttpFilterChain filterChain;
+//	protected HttpFilterChain filterChain;
 	
 	//具体的处理者
 	private final HttpClientProccessor processor = new HttpClientProccessor();
@@ -30,7 +29,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor<HttpResponseMessage> {
 	
 	public HttpClientAcceptor(HttpClientFactory httpClientFactory) {
 		super(httpClientFactory);
-		filterChain = new HttpClientFilterChain();
+//		filterChain = new HttpClientFilterChain();
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor<HttpResponseMessage> {
 	protected HttpClientSession prepareService(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 
 		// 创建session
-		HttpClientSession session = new HttpClientSession(this, request.getRequestMessage(), handler,filterChain);
+		HttpClientSession session = new HttpClientSession(this, request.getRequestMessage(), handler);
 		
 		return session;
 	}
@@ -51,7 +50,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor<HttpResponseMessage> {
 	@Override
 	public void release(){
 		super.release();
-		build(false);
+//		build(false);
 	}
 
 }

@@ -2,6 +2,7 @@ package org.http;
 
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -38,10 +39,10 @@ public class HttpAcceptorTest {
 
 			@Override
 			public void sessionCreated(NextHttpFilter nextFilter, HttpSession session) throws Exception {
-//				BigDecimal sum = new BigDecimal(1);
-//				for (int i = 1; i < 20; i++) {
-//					sum = sum.multiply(BigDecimal.valueOf(i));
-//				}
+				BigDecimal sum = new BigDecimal(1);
+				for (int i = 1; i < 20; i++) {
+					sum = sum.multiply(BigDecimal.valueOf(i));
+				}
 				//TimeUnit.SECONDS.sleep(2);
 				session.setAttribute("11", 1);
 			}
@@ -49,14 +50,14 @@ public class HttpAcceptorTest {
 			@Override
 			public void requestSuccessed(NextHttpFilter nextFilter, HttpSession session,
 					HttpResponseMessage responseMessage) throws Exception {
-				System.out.println(session.getName() + "====" + session.getAttribute("11") + "---"
+				System.out.println(session.getRequestMessage().getCompleteUrl() + "====" + session.getAttribute("11") + "---"
 						+ responseMessage.getContent().length());
 				//System.out.println(Arrays.toString(responseMessage.getResponseHeaders()));
 			}
 
 		});
 		long start = System.currentTimeMillis();
-		int count = 1;
+		int count = 1000;
 		CountDownLatch c = new CountDownLatch(count);
 		for (int i = 0; i < count; i++) {
 			new Thread(test.new Request(c,i)).start();
