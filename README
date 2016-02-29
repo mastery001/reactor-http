@@ -37,3 +37,4 @@
 ## 0.0.7 and 0.0.8 Version
 	1.取消httpAcceptor中的build和isBuild方法
 	2.将service改为每次都要构建filter链
+	3.IPUtil中的获取IP方法的逻辑变更
