@@ -20,10 +20,10 @@ class HttpClientSession extends BaseHttpSession {
 	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler, HttpFilterChain filterChain) {
+	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler) {
 		this.service = service;
 		this.httpRequestMessage = httpRequestMessage;
-		this.filterChain = filterChain;
+		this.filterChain = new HttpClientFilterChain();
 //		this.filterProcessor = filterProcessor;
 		this.handler = handler;
 	}

@@ -33,3 +33,8 @@
 	3.添加日志过滤器，专门负责记录日志
 	4.HttpRequestMessage中添加getCompleteUrl方法用于获取加上查询参数的完整路径
 	5.添加检验session关闭的功能
+
+## 0.0.7 and 0.0.8 Version
+	1.取消httpAcceptor中的build和isBuild方法
+	2.将service改为每次都要构建filter链
+	3.IPUtil中的获取IP方法的逻辑变更

@@ -45,12 +45,13 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 		HttpSession session = prepareService(request, handler);
 		
 		try {
+			getFilterChainBuilder().buildFilterChain(session.getFilterChain());
 			// 没有build链则build
-			if (!isBuild()) {
-				
-				getFilterChainBuilder().buildFilterChain(session.getFilterChain());
-				build(true);
-			}
+//			if (!isBuild()) {
+//				
+//				getFilterChainBuilder().buildFilterChain(session.getFilterChain());
+//				build(true);
+//			}
 		} catch (Exception e) {
 			ExceptionMonitor.getInstance().exceptionCaught(e);
 		}
@@ -76,10 +77,12 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 			 throws HttpSessionClosedException, HttpInvokeException ;
 
 
+	@Deprecated
 	public boolean isBuild() {
 		return isBuildChain;
 	}
 
+	@Deprecated
 	public void build(boolean build) {
 		isBuildChain = build;
 	}
