@@ -1,5 +1,6 @@
 package org.http.client;
 
+import org.http.HttpClientFactory;
 import org.http.HttpRequestMessage;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
@@ -18,13 +19,16 @@ class HttpClientSession extends BaseHttpSession {
 
 //	private final HttpClientProccessor filterProcessor;
 	
+	private final HttpClientFactory httpClientFactory;
+	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler) {
+	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler ,HttpClientFactory httpClientFactory) {
 		this.service = service;
 		this.httpRequestMessage = httpRequestMessage;
 		this.filterChain = new HttpClientFilterChain();
 //		this.filterProcessor = filterProcessor;
+		this.httpClientFactory = httpClientFactory;
 		this.handler = handler;
 	}
 
@@ -83,5 +87,10 @@ class HttpClientSession extends BaseHttpSession {
 	 */
 	Object getAttachment(){
 		return attachment;
+	}
+
+	@Override
+	public HttpClientFactory getHttpClientFactory() {
+		return httpClientFactory;
 	}
 }

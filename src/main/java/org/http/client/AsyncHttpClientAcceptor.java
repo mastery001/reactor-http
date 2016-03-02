@@ -39,7 +39,7 @@ public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpRespons
 
 	private final int id = nextId++;
 
-//	protected HttpFilterChain filterChain;
+	// protected HttpFilterChain filterChain;
 
 	/**
 	 * 预留http处理者的数组，可能以后会修改成异步调用http的方式 2016年1月26日 下午5:11:39
@@ -64,7 +64,7 @@ public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpRespons
 		}
 		this.executor = executor;
 		this.processorCount = processorCount;
-//		filterChain = new HttpClientFilterChain();
+		// filterChain = new HttpClientFilterChain();
 		httpProcessor = new AyncHttpClientProccessor[this.processorCount];
 		for (int i = 0; i < processorCount; i++) {
 			httpProcessor[i] = new AyncHttpClientProccessor("AyncHttpClientFilterProccessor-" + id + "." + i, executor);
@@ -88,7 +88,8 @@ public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpRespons
 	protected HttpSession prepareService(HttpRequest request, HttpHandler handler)
 			throws HttpSessionClosedException, HttpInvokeException {
 		// 创建session
-		HttpClientSession session = new HttpClientSession(this, request.getRequestMessage(), handler);
+		HttpClientSession session = new HttpClientSession(this, request.getRequestMessage(), handler,
+				httpClientFactory);
 		return session;
 	}
 

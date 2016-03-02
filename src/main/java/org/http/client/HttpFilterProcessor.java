@@ -57,7 +57,7 @@ abstract class HttpFilterProcessor<T> {
 	 */
 	void checkSessionClose(HttpClientSession session) throws HttpSessionClosedException {
 		if (session.isClose()) {
-			throw new HttpSessionClosedException(session.getName());
+			throw new HttpSessionClosedException(session.getRequestMessage().getCompleteUrl());
 		}
 	}
 

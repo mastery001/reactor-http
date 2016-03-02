@@ -1,5 +1,6 @@
 package org.http.chain;
 
+import org.http.HttpClientFactory;
 import org.http.HttpRequestMessage;
 
 /**
@@ -24,6 +25,13 @@ public interface HttpSession {
 //	 * @return 2016年1月19日 上午11:33:11
 //	 */
 //	HttpService getService();
+	
+	/**
+	 * 获取本次会话使用的连接
+	 * @return
+	 * 2016年3月2日 下午3:37:37
+	 */
+	HttpClientFactory getHttpClientFactory();
 	
 	
 	/**

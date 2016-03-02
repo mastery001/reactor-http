@@ -45,6 +45,7 @@ public class HttpAcceptorTest {
 				}
 				//TimeUnit.SECONDS.sleep(2);
 				session.setAttribute("11", 1);
+				session.close();
 			}
 
 			@Override
@@ -57,7 +58,7 @@ public class HttpAcceptorTest {
 
 		});
 		long start = System.currentTimeMillis();
-		int count = 1000;
+		int count = 1;
 		CountDownLatch c = new CountDownLatch(count);
 		for (int i = 0; i < count; i++) {
 			new Thread(test.new Request(c,i)).start();
@@ -86,7 +87,7 @@ public class HttpAcceptorTest {
 			try {
 				client.service(request);
 			} catch (HttpInvokeException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			}
 			c.countDown();
 		}
