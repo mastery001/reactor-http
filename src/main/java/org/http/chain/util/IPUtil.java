@@ -68,6 +68,7 @@ public class IPUtil {
 		if (null != ip) {
 			sIP = ip.getHostAddress();
 		}
+		logger.info("this service localhost is {}" , sIP);
 		return sIP;
 	}
 
