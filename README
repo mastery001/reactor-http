@@ -37,4 +37,6 @@
 ## 0.0.7 and 0.0.8 Version
 	1.取消httpAcceptor中的build和isBuild方法
 	2.将service改为每次都要构建filter链
-	3.IPUtil中的获取IP方法的逻辑变更
+	
+## 0.0.9 version
+	1.IPUtil中的获取IP方法的逻辑变更（0.0.8发布的版本也已经修复该bug）
