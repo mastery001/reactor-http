@@ -37,4 +37,11 @@ public interface HttpAcceptor<T> {
 	 */
 	T service(HttpRequest request, HttpHandler handler)
 			throws HttpSessionClosedException, HttpInvokeException;
+	
+	/**
+	 * 获取http连接工厂
+	 * @time 2016年3月25日下午8:28:46
+	 * @return
+	 */
+	HttpClientFactory getHttpClientFactory();
 }

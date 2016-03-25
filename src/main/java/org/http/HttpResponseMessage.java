@@ -3,6 +3,7 @@ package org.http;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 
 /**
@@ -41,6 +42,14 @@ public interface HttpResponseMessage {
 	 * 2016年1月18日 下午5:58:47
 	 */
 	Header[] getResponseHeaders();
+	
+	/**
+	 * 获取响应头信息
+	 * @time 2016年3月25日下午8:52:59
+	 * @param headerName
+	 * @return
+	 */
+	Header getResponseHeader(String headerName);
 
 	/**
 	 * 响应尾信息
@@ -48,7 +57,22 @@ public interface HttpResponseMessage {
 	 * 2016年1月18日 下午5:58:58
 	 */
 	Header[] getResponseFooters();
+	
+	/**
+	 * 获取响应尾信息
+	 * @time 2016年3月25日下午8:52:59
+	 * @param footerName
+	 * @return
+	 */
+	Header getResponseFooter(String footerName);
 
+	/**
+	 * 获取cookies
+	 * @time 2016年3月25日下午8:29:31
+	 * @return
+	 */
+	Cookie[] getCookies();
+	
 	/**
 	 * 获取响应体的内容
 	 * @return

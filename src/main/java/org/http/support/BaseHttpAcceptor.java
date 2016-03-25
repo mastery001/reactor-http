@@ -86,4 +86,10 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 	public void build(boolean build) {
 		isBuildChain = build;
 	}
+
+	@Override
+	public HttpClientFactory getHttpClientFactory() {
+		return this.httpClientFactory;
+	}
+	
 }

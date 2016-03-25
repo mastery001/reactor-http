@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
+import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -181,7 +182,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 			 * 执行方法
 			 */
 			httpClient.executeMethod(method);
-			return new HttpResponseImpl(method);
+			return new HttpResponseImpl(method , httpClient.getState().getCookies());
 		} catch (HttpException e) {
 			if (e instanceof ProtocolException) {
 				throw new HttpInvokeException(InvokeErrorCode.HTTP_PROTOCOL_INVAILD, e);
@@ -258,9 +259,12 @@ public abstract class BaseHttpRequest implements HttpRequest {
 		public HttpMethod method;
 
 		private String content;
+		
+		private Cookie[] cookies;
 
-		public HttpResponseImpl(HttpMethod method) throws IOException {
+		public HttpResponseImpl(HttpMethod method, Cookie[] cookies) throws IOException {
 			this.method = method;
+			this.cookies = cookies;
 			content = extractContent(method);
 		}
 
@@ -302,6 +306,21 @@ public abstract class BaseHttpRequest implements HttpRequest {
 		@Override
 		public boolean isSuccess() {
 			return getStatusCode() == HttpStatus.SC_OK;
+		}
+
+		@Override
+		public Cookie[] getCookies() {
+			return cookies;
+		}
+
+		@Override
+		public Header getResponseHeader(String headerName) {
+			return method.getResponseHeader(headerName);
+		}
+
+		@Override
+		public Header getResponseFooter(String footerName) {
+			return method.getResponseFooter(footerName);
 		}
 
 	}

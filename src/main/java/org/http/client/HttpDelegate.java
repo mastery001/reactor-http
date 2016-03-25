@@ -3,6 +3,7 @@ package org.http.client;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.http.HttpAcceptor;
+import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpResponseMessage;
 import org.http.chain.DefaultHttpFilterChainBuilder;
@@ -47,6 +48,11 @@ public class HttpDelegate implements HttpAcceptor<HttpResponseMessage>{
 	@Override
 	public HttpResponseMessage service(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 		return server.service(request,handler);
+	}
+
+	@Override
+	public HttpClientFactory getHttpClientFactory() {
+		return server.getHttpClientFactory();
 	}
 	
 }
