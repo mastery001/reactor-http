@@ -44,3 +44,4 @@
 	
 ## 0.0.10 version
 	1.HttpResponseMessage添加返回Cookie[]的方法
+	2.初始化HttpResponseImpl类导致调用getResponseBody方法获得null的bug

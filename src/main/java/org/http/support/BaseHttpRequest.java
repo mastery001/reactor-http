@@ -1,6 +1,7 @@
 package org.http.support;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -245,8 +246,8 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	 * @throws IOException
 	 *             2016年1月18日 下午5:58:23
 	 */
-	protected String extractContent(HttpMethod method) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream()));
+	protected String extractContent(byte[] responseBody) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(responseBody)));
 		StringBuffer sb = new StringBuffer();
 		String line;
 		while ((line = reader.readLine()) != null) {
@@ -260,12 +261,15 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 		private String content;
 		
+		private byte[] responseBody;
+		
 		private Cookie[] cookies;
 
 		public HttpResponseImpl(HttpMethod method, Cookie[] cookies) throws IOException {
 			this.method = method;
 			this.cookies = cookies;
-			content = extractContent(method);
+			responseBody = getResponseBody();
+			content = extractContent(responseBody);
 		}
 
 		@Override
@@ -290,7 +294,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 		@Override
 		public byte[] getResponseBody() throws IOException {
-			return method.getResponseBody();
+			return responseBody;
 		}
 
 		@Override
