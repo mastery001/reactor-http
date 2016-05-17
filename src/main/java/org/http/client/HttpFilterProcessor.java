@@ -39,7 +39,7 @@ abstract class HttpFilterProcessor<T> {
 			} else {
 				session.getFilterChain().fireRequestFailed(session, responseMessage);
 			}
-		} catch (Exception e) {
+		} catch (HttpInvokeException e) {
 			session.getFilterChain().fireExceptionCaught(session, e);
 			throw e;
 		} finally {
