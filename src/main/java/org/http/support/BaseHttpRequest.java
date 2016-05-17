@@ -268,7 +268,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 		public HttpResponseImpl(HttpMethod method, Cookie[] cookies) throws IOException {
 			this.method = method;
 			this.cookies = cookies;
-			responseBody = getResponseBody();
+			responseBody = method.getResponseBody();
 			content = extractContent(responseBody);
 		}
 
