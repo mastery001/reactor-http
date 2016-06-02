@@ -1,7 +1,7 @@
 package org.http.client;
 
 import org.http.HttpClientFactory;
-import org.http.HttpRequestMessage;
+import org.http.HttpRequest;
 import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpService;
@@ -11,7 +11,7 @@ class HttpClientSession extends BaseHttpSession {
 
 	private final HttpService service;
 
-	private final HttpRequestMessage httpRequestMessage;
+	private final HttpRequest httpRequest;
 
 	private final HttpFilterChain filterChain;
 
@@ -23,9 +23,9 @@ class HttpClientSession extends BaseHttpSession {
 	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequestMessage httpRequestMessage, HttpHandler handler ,HttpClientFactory httpClientFactory) {
+	public HttpClientSession(HttpService service, HttpRequest httpRequest, HttpHandler handler ,HttpClientFactory httpClientFactory) {
 		this.service = service;
-		this.httpRequestMessage = httpRequestMessage;
+		this.httpRequest = httpRequest;
 		this.filterChain = new HttpClientFilterChain();
 //		this.filterProcessor = filterProcessor;
 		this.httpClientFactory = httpClientFactory;
@@ -33,8 +33,8 @@ class HttpClientSession extends BaseHttpSession {
 	}
 
 	@Override
-	public HttpRequestMessage getRequestMessage() {
-		return httpRequestMessage;
+	public HttpRequest getHttpRequest() {
+		return httpRequest;
 	}
 
 	@Override
@@ -62,7 +62,7 @@ class HttpClientSession extends BaseHttpSession {
 
 	@Override
 	public String getName() {
-		return getRequestMessage().getURL();
+		return getHttpRequest().getURI().toString();
 	}
 	
 	/**

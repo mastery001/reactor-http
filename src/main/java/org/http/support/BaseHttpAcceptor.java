@@ -29,7 +29,7 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 
 	public BaseHttpAcceptor(HttpClientFactory httpClientFactory) {
 		if (httpClientFactory == null) {
-			httpClientFactory = HttpClientFactory.DEFAULT_FACTORY;
+			httpClientFactory = GlobalHttpClientFactory.getInstance();
 		}
 		this.httpClientFactory = httpClientFactory;
 	}

@@ -1,55 +1,55 @@
 package org.http.client.method;
 
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.message.BasicNameValuePair;
+import org.http.HttpRequest;
 import org.http.support.BaseHttpRequest;
 
-/**
- * http的post请求
- * @author zouziwen
- *
- * 2016年1月19日 下午6:47:30
- */
 public class HttpPostRequest extends BaseHttpRequest{
 
-	/**
-	 * @see {@link BaseHttpRequest } constructor
-	 * @param baseUrl
-	 * 2016年1月25日 下午4:12:57
-	 */
+	private final List <NameValuePair> nvps = new ArrayList <NameValuePair>();
+	
 	public HttpPostRequest(String baseUrl) {
 		super(baseUrl);
 	}
 
-	/**
-	 * @see {@link BaseHttpRequest } constructor
-	 * @param baseUrl
-	 * @param isRetry
-	 * 2016年1月25日 下午4:13:01
-	 */
 	public HttpPostRequest(String baseUrl, boolean isRetry) {
 		super(baseUrl, isRetry);
 	}
 
 	@Override
-	protected HttpMethod innerInitMethod() {
-		PostMethod method = new PostMethod(baseUrl);
-		method.setRequestHeader("Connection", "close");
-		return method;
+	protected HttpRequestBase initRequest(String baseUrl) {
+		return new HttpPost(baseUrl);
 	}
 
 	@Override
-	protected void prepareRequest(HttpMethod method ,NameValuePair[] nameValuePairs) {
-		PostMethod post = getMethod();
-		post.getParams().setParameter(HttpMethodParams.HTTP_CONTENT_CHARSET, DEFAULT_CHARET);
-		post.setRequestBody(nameValuePairs);
+	public HttpRequest addParameter(String paramName, Object paramValue) {
+		nvps.add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
+		return this;
 	}
-	
+
 	@Override
-	public PostMethod getMethod() {
-		return (PostMethod)super.getMethod();
+	public HttpRequest prepare() {
+		HttpPost post = (HttpPost) getRequest();
+		try {
+			post.setEntity(new UrlEncodedFormEntity(nvps));
+		} catch (UnsupportedEncodingException e) {
+			// 防止setEntity报错时,调用父类的方法,容错
+			for(NameValuePair pair : nvps) {
+				super.addParameter(pair.getName(), pair.getValue());
+			}
+			super.prepare();
+		}
+		return this;
 	}
 	
+	
+
 }

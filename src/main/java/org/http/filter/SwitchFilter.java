@@ -3,11 +3,13 @@ package org.http.filter;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.cache.DistributedCache;
 import org.cache.redis.RedisDistributedCache;
 import org.http.HttpRequest;
-import org.http.HttpRequestMessage.MethodType;
 import org.http.HttpResponseMessage;
+import org.http.MethodType;
 import org.http.chain.HttpFilterAdapter;
 import org.http.chain.HttpSession;
 import org.http.chain.util.Constant;
@@ -47,7 +49,7 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 
 		void run(final HttpSession session) {
 			if (!runRequest) {
-				final String url = session.getRequestMessage().getCompleteUrl();
+				final String url = session.getHttpRequest().getURI().toString();
 				executor.execute(new NamePreservingRunnable(new Runnable() {
 
 					@Override
@@ -86,7 +88,7 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 	 */
 	protected void asyncFatalRequest(HttpSession session) {
 		String url = session.getName();
-		MethodType type = session.getRequestMessage().getMethod();
+		MethodType type = MethodType.valueOf(session.getHttpRequest().getMethod());
 		HttpRequest request = null;
 		switch (type) {
 		case GET:
@@ -115,17 +117,17 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 	 * @param type
 	 * @return 2016年3月2日 下午3:50:43
 	 */
-	private boolean retryRequest(HttpRequest request, long sleepTime, HttpSession session) {
+	private boolean retryRequest(HttpUriRequest request, long sleepTime, HttpSession session) {
 		try {
 			TimeUnit.SECONDS.sleep(sleepTime);
-			HttpResponseMessage response = request.sendRequest(session.getHttpClientFactory());
-			if (response.isSuccess()) {
+			HttpResponse response = session.getHttpClientFactory().getConnection().execute(request);
+			if (response.getStatusLine().getStatusCode() == 200) {
 				cache.set(session.getName(), new FatalCount());
 				return true;
 			}
-		} catch (HttpInvokeException e) {
 		} catch (InterruptedException e) {
 			logger.info("retry request error ; exception is {}", e);
+		} catch (Exception e) {
 		}
 		return false;
 	}

@@ -5,8 +5,6 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.http.chain.HttpFilterAdapter;
 import org.http.chain.HttpSession;
 import org.http.client.HttpClientAcceptor;
@@ -17,20 +15,7 @@ import org.junit.Test;
 
 public class HttpAcceptorTest {
 
-	final static HttpClientAcceptor client = new HttpClientAcceptor(new HttpClientFactory() {
-
-		@Override
-		public HttpClient getConnection() {
-			MultiThreadedHttpConnectionManager connectionManager = new MultiThreadedHttpConnectionManager();
-			connectionManager.getParams().setConnectionTimeout(1000);
-			connectionManager.getParams().setSoTimeout(4000);
-			connectionManager.getParams().setDefaultMaxConnectionsPerHost(5);
-			HttpClient httpClient = new HttpClient(connectionManager);
-			httpClient.getHostConfiguration().setProxy("123.125.65.82", 80);
-			return httpClient;
-		}
-		
-	});
+	public static final HttpClientAcceptor client = new HttpClientAcceptor();
 	
 	public static void main(String[] args) throws InterruptedException {
 		HttpAcceptorTest test = new HttpAcceptorTest();
@@ -45,20 +30,19 @@ public class HttpAcceptorTest {
 				}
 				//TimeUnit.SECONDS.sleep(2);
 				session.setAttribute("11", 1);
-				session.close();
 			}
 
 			@Override
 			public void requestSuccessed(NextHttpFilter nextFilter, HttpSession session,
 					HttpResponseMessage responseMessage) throws Exception {
-				System.out.println(session.getRequestMessage().getCompleteUrl() + "====" + session.getAttribute("11") + "---"
+				System.out.println(session.getHttpRequest().getURI() + "====" + session.getAttribute("11") + "---"
 						+ responseMessage.getContent().length());
 				//System.out.println(Arrays.toString(responseMessage.getResponseHeaders()));
 			}
 
 		});
 		long start = System.currentTimeMillis();
-		int count = 1;
+		int count = 100;
 		CountDownLatch c = new CountDownLatch(count);
 		for (int i = 0; i < count; i++) {
 			new Thread(test.new Request(c,i)).start();
@@ -81,13 +65,13 @@ public class HttpAcceptorTest {
 		
 		@Override
 		public void run() {
-			HttpGetRequest request = new HttpGetRequest("http://www.baidu.com/s" , true);
+			HttpGetRequest request = new HttpGetRequest("http://www.baidu.com/s");
 			request.addParameter("wd", "ceshi" + i);
 			request.addParameter("ie", "utf-8");
 			try {
 				client.service(request);
 			} catch (HttpInvokeException e) {
-				e.printStackTrace();
+				
 			}
 			c.countDown();
 		}

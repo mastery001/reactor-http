@@ -59,7 +59,7 @@ public abstract class FailedReportFilter extends HttpFilterAdapter {
 		}, threadName));
 	}
 
-	/**
+	/**	
 	 * 具体的上报实现
 	 * 
 	 * @param url	concrete request's url

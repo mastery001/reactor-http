@@ -42,7 +42,7 @@ public class HttpClientAcceptor extends BaseHttpAcceptor<HttpResponseMessage> {
 	protected HttpClientSession prepareService(HttpRequest request, HttpHandler handler) throws HttpSessionClosedException, HttpInvokeException  {
 
 		// 创建session
-		HttpClientSession session = new HttpClientSession(this, request.getRequestMessage(), handler , httpClientFactory);
+		HttpClientSession session = new HttpClientSession(this, request, handler , httpClientFactory);
 		
 		return session;
 	}
