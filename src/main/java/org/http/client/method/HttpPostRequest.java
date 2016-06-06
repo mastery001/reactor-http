@@ -8,11 +8,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicNameValuePair;
-import org.http.HttpRequest;
-import org.http.support.BaseHttpRequest;
+import org.http.HttpParameterOperation;
+import org.http.support.BaseHttpEntityRequest;
 
-public class HttpPostRequest extends BaseHttpRequest{
+public class HttpPostRequest extends BaseHttpEntityRequest{
 
 	private final List <NameValuePair> nvps = new ArrayList <NameValuePair>();
 	
@@ -25,31 +26,28 @@ public class HttpPostRequest extends BaseHttpRequest{
 	}
 
 	@Override
-	protected HttpRequestBase initRequest(String baseUrl) {
-		return new HttpPost(baseUrl);
-	}
-
-	@Override
-	public HttpRequest addParameter(String paramName, Object paramValue) {
+	public HttpParameterOperation addParameter(String paramName, Object paramValue) {
 		nvps.add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
 		return this;
 	}
 
 	@Override
-	public HttpRequest prepare() {
-		HttpPost post = (HttpPost) getRequest();
+	public HttpUriRequest concreteRequest() {
 		try {
-			post.setEntity(new UrlEncodedFormEntity(nvps));
+			getRequest().setEntity(new UrlEncodedFormEntity(nvps));
 		} catch (UnsupportedEncodingException e) {
 			// 防止setEntity报错时,调用父类的方法,容错
 			for(NameValuePair pair : nvps) {
 				super.addParameter(pair.getName(), pair.getValue());
 			}
-			super.prepare();
+			super.concreteRequest();
 		}
-		return this;
+		return getRequest();
 	}
-	
-	
+
+	@Override
+	protected HttpRequestBase initRequest(String baseUrl) {
+		return new HttpPost(baseUrl);
+	}
 
 }

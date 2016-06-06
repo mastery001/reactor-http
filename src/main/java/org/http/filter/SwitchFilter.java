@@ -4,7 +4,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.cache.DistributedCache;
 import org.cache.redis.RedisDistributedCache;
 import org.http.HttpRequest;
@@ -117,10 +116,10 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 	 * @param type
 	 * @return 2016年3月2日 下午3:50:43
 	 */
-	private boolean retryRequest(HttpUriRequest request, long sleepTime, HttpSession session) {
+	private boolean retryRequest(HttpRequest request, long sleepTime, HttpSession session) {
 		try {
 			TimeUnit.SECONDS.sleep(sleepTime);
-			HttpResponse response = session.getHttpClientFactory().getConnection().execute(request);
+			HttpResponse response = session.getHttpClientFactory().getConnection().execute(request.concreteRequest());
 			if (response.getStatusLine().getStatusCode() == 200) {
 				cache.set(session.getName(), new FatalCount());
 				return true;

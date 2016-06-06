@@ -1,8 +1,8 @@
 package org.http.client;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
-import java.nio.charset.Charset;
 import java.util.Locale;
 
 import org.apache.http.Header;
@@ -10,10 +10,10 @@ import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.ParseException;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
@@ -80,14 +80,14 @@ abstract class HttpFilterProcessor<T> {
 	private HttpResponseMessage process(HttpRequest request, HttpClientFactory httpClientFactory)
 			throws HttpInvokeException {
 		try {
+			HttpUriRequest concreteRequest = request.concreteRequest();
 			/**
 			 * 执行方法
 			 */
-			request = request.prepare();
 			if(request.isRetry()) {
-				return retryProcess(request , httpClientFactory);
+				return retryProcess(concreteRequest , httpClientFactory);
 			}
-			return new HttpResponseImpl(httpClientFactory.getConnection().execute(request));
+			return new HttpResponseImpl(httpClientFactory.getConnection().execute(concreteRequest));
 			
 		} catch (IOException e) {
 			if (e instanceof ClientProtocolException) {
@@ -103,31 +103,31 @@ abstract class HttpFilterProcessor<T> {
 		}
 	}
 
-	private HttpResponseMessage retryProcess(HttpRequest request, HttpClientFactory httpClientFactory) throws IOException {
+	private HttpResponseMessage retryProcess(HttpUriRequest concreteRequest, HttpClientFactory httpClientFactory) throws IOException {
 		HttpRequestRetryHandler retryHandler = new HttpRetryHandler();
-		final Header[] origheaders = request.getAllHeaders();
+		final Header[] origheaders = concreteRequest.getAllHeaders();
 		HttpResponse reponse = null;
 		for (int execCount = 1;; execCount++) {
 			try {
-				reponse = httpClientFactory.getConnection().execute(request);
+				reponse = httpClientFactory.getConnection().execute(concreteRequest);
 			} catch (final IOException ex) {
-				if (retryHandler.retryRequest(ex, execCount, request)) {
+				if (retryHandler.retryRequest(ex, execCount, concreteRequest)) {
 					if (this.log.isInfoEnabled()) {
 						this.log.info(
 								"I/O exception (" + ex.getClass().getName() + ") caught when processing request to "
-										+ request.getURI() + ": " + ex.getMessage());
+										+ concreteRequest.getURI() + ": " + ex.getMessage());
 					}
 					if (this.log.isDebugEnabled()) {
 						this.log.debug(ex.getMessage(), ex);
 					}
-					request.setHeaders(origheaders);
+					concreteRequest.setHeaders(origheaders);
 					if (this.log.isInfoEnabled()) {
-						this.log.info("Retrying request to " + request.getURI());
+						this.log.info("Retrying request to " + concreteRequest.getURI());
 					}
 				} else {
                     if (ex instanceof NoHttpResponseException) {
                         final NoHttpResponseException updatedex = new NoHttpResponseException(
-                        		request.getURI() + " failed to respond");
+                        		concreteRequest.getURI() + " failed to respond");
                         updatedex.setStackTrace(ex.getStackTrace());
                         throw updatedex;
                     } else {
@@ -292,13 +292,30 @@ abstract class HttpFilterProcessor<T> {
 		@Override
 		public String getContent() throws HttpResponseProcessException {
 			try {
-				return EntityUtils.toString(this.getEntity(), Charset.defaultCharset());
-			} catch (ParseException e) {
-				throw new HttpResponseProcessException(e);
-			} catch (IOException e) {
-				throw new HttpResponseProcessException(e);
+				return new String(getResponseBody() , "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// never happen
 			}
+			return null;
 		}
+
+		@Override
+		public byte[] getResponseBody() throws HttpResponseProcessException {
+			if(byteContents == null) {
+				synchronized (lock) {
+					try {
+						byteContents =  EntityUtils.toByteArray(this.getEntity());
+					}catch (IOException e) {
+						throw new HttpResponseProcessException(e);
+					}
+				}
+			}
+			return byteContents;
+		}
+		
+		private byte[] byteContents;
+		
+		private final byte[] lock = new byte[0];
 
 	}
 

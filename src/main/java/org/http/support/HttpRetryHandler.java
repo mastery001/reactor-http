@@ -7,6 +7,7 @@ import java.net.UnknownHostException;
 import javax.net.ssl.SSLException;
 
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.http.HttpRequestRetryHandler;
 import org.slf4j.Logger;
@@ -43,7 +44,7 @@ public class HttpRetryHandler implements HttpRequestRetryHandler {
     }
 
 	@Override
-	public boolean retryRequest(IOException exception, int executionCount, org.http.HttpRequest httpRequest) {
+	public boolean retryRequest(IOException exception, int executionCount, HttpUriRequest request) {
 		if (executionCount > this.retryCount) {
 			// Do not retry if over max retry count
 			return false;
@@ -65,7 +66,7 @@ public class HttpRetryHandler implements HttpRequestRetryHandler {
 			// SSL handshake exception
 			return true;
 		}
-		boolean idempotent = !(httpRequest instanceof HttpEntityEnclosingRequest);
+		boolean idempotent = !(request instanceof HttpEntityEnclosingRequest);
 		if (idempotent) {
 			// Retry if the request is considered idempotent
 			return true;

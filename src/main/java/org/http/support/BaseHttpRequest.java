@@ -11,12 +11,14 @@ import org.apache.http.HeaderIterator;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.params.HttpParams;
+import org.http.HttpParameterOperation;
 import org.http.HttpRequest;
 import org.http.chain.util.Constant;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseHttpRequest implements HttpRequest{
+public abstract class BaseHttpRequest implements HttpRequest , HttpParameterOperation{
 
 	private final HttpRequestBase request;
 	
@@ -61,12 +63,12 @@ public abstract class BaseHttpRequest implements HttpRequest{
 	}
 
 	@Override
-	public HttpRequest prepare() {
+	public HttpUriRequest concreteRequest() {
 		String url = getCompleteUrl();
 		if(url != null) {
 			request.setURI(URI.create(url));
 		}
-		return this;
+		return request;
 	}
 	
 	protected String getBaseUrl() {
@@ -211,7 +213,7 @@ public abstract class BaseHttpRequest implements HttpRequest{
 	}
 
 	@Override
-	public HttpRequest addParameter(String paramName, Object paramValue) {
+	public HttpParameterOperation addParameter(String paramName, Object paramValue) {
 		paramBuilder.addParameter(paramName, paramValue);
 		return this;
 	}
