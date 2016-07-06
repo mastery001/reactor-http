@@ -3,7 +3,7 @@ package org.http;
 import org.apache.http.HttpMessage;
 import org.apache.http.client.methods.HttpUriRequest;
 
-public interface HttpRequest extends HttpUriRequest , HttpMessage{
+public interface HttpRequest extends HttpUriRequest , HttpMessage , HttpParameterOperation{
 	
 	
 	/**

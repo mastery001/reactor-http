@@ -38,4 +38,10 @@ public class ExceptionMonitor {
 			log.warn("Unexpected exception.", cause);
 		}
 	}
+	
+	public void ignoreCaught(Throwable cause) {
+		if (log.isWarnEnabled()) {
+			log.warn("Ignore exception.", cause);
+		}
+	}
 }

@@ -1,29 +1,19 @@
 package org.http.client;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.SocketTimeoutException;
-import java.util.Locale;
 
 import org.apache.http.Header;
-import org.apache.http.HeaderIterator;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NoHttpResponseException;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ConnectTimeoutException;
-import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestRetryHandler;
 import org.http.HttpResponseMessage;
+import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
-import org.http.exception.HttpResponseProcessException;
 import org.http.exception.HttpSessionClosedException;
 import org.http.support.HttpRetryHandler;
 import org.slf4j.Logger;
@@ -37,7 +27,6 @@ import org.slf4j.LoggerFactory;
  * @param <T>
  *            2016年2月24日 下午1:22:55
  */
-@SuppressWarnings("deprecation")
 abstract class HttpFilterProcessor<T> {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -51,6 +40,7 @@ abstract class HttpFilterProcessor<T> {
 	 * @param request
 	 * @param session
 	 * @param httpClientFactory
+	 * @param executor 
 	 * @return
 	 * @throws Exception
 	 *             2016年2月24日 下午1:20:46
@@ -61,8 +51,8 @@ abstract class HttpFilterProcessor<T> {
 		checkSessionClose(session);
 		HttpResponseMessage responseMessage = null;
 		try {
-			responseMessage = process(request, httpClientFactory);
-			if (responseMessage.getStatusLine().getStatusCode() == 200) {
+			responseMessage = process(request, httpClientFactory , session);
+			if (responseMessage.isSuccess()) {
 				session.getFilterChain().fireRequestSuccessed(session, responseMessage);
 			} else {
 				session.getFilterChain().fireRequestFailed(session, responseMessage);
@@ -77,17 +67,17 @@ abstract class HttpFilterProcessor<T> {
 		return responseMessage;
 	}
 
-	private HttpResponseMessage process(HttpRequest request, HttpClientFactory httpClientFactory)
+	private HttpResponseMessage process(HttpRequest request, HttpClientFactory httpClientFactory, HttpSession session)
 			throws HttpInvokeException {
 		try {
-			HttpUriRequest concreteRequest = request.concreteRequest();
+			//HttpUriRequest concreteRequest = request.concreteRequest();
 			/**
 			 * 执行方法
 			 */
 			if(request.isRetry()) {
-				return retryProcess(concreteRequest , httpClientFactory);
+				return retryProcess(request , httpClientFactory , session);
 			}
-			return new HttpResponseImpl(httpClientFactory.getConnection().execute(concreteRequest));
+			return session.getHttpExecutor().execute(httpClientFactory, request);
 			
 		} catch (IOException e) {
 			if (e instanceof ClientProtocolException) {
@@ -103,13 +93,13 @@ abstract class HttpFilterProcessor<T> {
 		}
 	}
 
-	private HttpResponseMessage retryProcess(HttpUriRequest concreteRequest, HttpClientFactory httpClientFactory) throws IOException {
+	private HttpResponseMessage retryProcess(HttpRequest concreteRequest, HttpClientFactory httpClientFactory, HttpSession session) throws IOException {
 		HttpRequestRetryHandler retryHandler = new HttpRetryHandler();
 		final Header[] origheaders = concreteRequest.getAllHeaders();
-		HttpResponse reponse = null;
+		HttpResponseMessage reponse = null;
 		for (int execCount = 1;; execCount++) {
 			try {
-				reponse = httpClientFactory.getConnection().execute(concreteRequest);
+				reponse = session.getHttpExecutor().execute(httpClientFactory, concreteRequest);
 			} catch (final IOException ex) {
 				if (retryHandler.retryRequest(ex, execCount, concreteRequest)) {
 					if (this.log.isInfoEnabled()) {
@@ -136,187 +126,9 @@ abstract class HttpFilterProcessor<T> {
                 }
 				continue;
 			}
-			return new HttpResponseImpl(reponse);
+			return reponse;
 		}
 		
-	}
-
-	static class HttpResponseImpl implements HttpResponseMessage {
-
-		private final HttpResponse response;
-
-		HttpResponseImpl(HttpResponse response) {
-			this.response = response;
-		}
-
-		@Override
-		public StatusLine getStatusLine() {
-			return response.getStatusLine();
-		}
-
-		@Override
-		public void setStatusLine(StatusLine statusline) {
-			response.setStatusLine(statusline);
-		}
-
-		@Override
-		public void setStatusLine(ProtocolVersion ver, int code) {
-			response.setStatusLine(ver, code);
-		}
-
-		@Override
-		public void setStatusLine(ProtocolVersion ver, int code, String reason) {
-			response.setStatusLine(ver, code, reason);
-		}
-
-		@Override
-		public void setStatusCode(int code) throws IllegalStateException {
-			response.setStatusCode(code);
-		}
-
-		@Override
-		public void setReasonPhrase(String reason) throws IllegalStateException {
-			response.setReasonPhrase(reason);
-		}
-
-		@Override
-		public HttpEntity getEntity() {
-			return response.getEntity();
-		}
-
-		@Override
-		public void setEntity(HttpEntity entity) {
-			response.setEntity(entity);
-		}
-
-		@Override
-		public Locale getLocale() {
-			return response.getLocale();
-		}
-
-		@Override
-		public void setLocale(Locale loc) {
-			response.setLocale(loc);
-		}
-
-		@Override
-		public ProtocolVersion getProtocolVersion() {
-			return response.getProtocolVersion();
-		}
-
-		@Override
-		public boolean containsHeader(String name) {
-			return response.containsHeader(name);
-		}
-
-		@Override
-		public Header[] getHeaders(String name) {
-			return response.getHeaders(name);
-		}
-
-		@Override
-		public Header getFirstHeader(String name) {
-			return response.getFirstHeader(name);
-		}
-
-		@Override
-		public Header getLastHeader(String name) {
-			return response.getLastHeader(name);
-		}
-
-		@Override
-		public Header[] getAllHeaders() {
-			return response.getAllHeaders();
-		}
-
-		@Override
-		public void addHeader(Header header) {
-			response.addHeader(header);
-		}
-
-		@Override
-		public void addHeader(String name, String value) {
-			response.addHeader(name, value);
-		}
-
-		@Override
-		public void setHeader(Header header) {
-			response.setHeader(header);
-		}
-
-		@Override
-		public void setHeader(String name, String value) {
-			response.setHeader(name, value);
-		}
-
-		@Override
-		public void setHeaders(Header[] headers) {
-			response.setHeaders(headers);
-		}
-
-		@Override
-		public void removeHeader(Header header) {
-			response.removeHeader(header);
-		}
-
-		@Override
-		public void removeHeaders(String name) {
-			response.removeHeaders(name);
-		}
-
-		@Override
-		public HeaderIterator headerIterator() {
-			return response.headerIterator();
-		}
-
-		@Override
-		public HeaderIterator headerIterator(String name) {
-			return response.headerIterator(name);
-		}
-
-		@Override
-		public HttpParams getParams() {
-			return response.getParams();
-		}
-
-		@Override
-		public void setParams(HttpParams params) {
-			response.setParams(params);
-		}
-
-		@Override
-		public boolean isSuccess() {
-			return this.getStatusLine().getStatusCode() == SUCCESS_CODE;
-		}
-
-		@Override
-		public String getContent() throws HttpResponseProcessException {
-			try {
-				return new String(getResponseBody() , "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// never happen
-			}
-			return null;
-		}
-
-		@Override
-		public byte[] getResponseBody() throws HttpResponseProcessException {
-			if(byteContents == null) {
-				synchronized (lock) {
-					try {
-						byteContents =  EntityUtils.toByteArray(this.getEntity());
-					}catch (IOException e) {
-						throw new HttpResponseProcessException(e);
-					}
-				}
-			}
-			return byteContents;
-		}
-		
-		private byte[] byteContents;
-		
-		private final byte[] lock = new byte[0];
-
 	}
 
 	/**

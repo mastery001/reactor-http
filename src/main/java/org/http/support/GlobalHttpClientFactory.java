@@ -8,7 +8,7 @@ public abstract class GlobalHttpClientFactory {
 		return instance;
 	}
 
-	static void reset() {
+	public static void reset() {
 		instance = new DefaultHttpClientFactory();
 	}
 	

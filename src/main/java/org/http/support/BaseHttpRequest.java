@@ -18,7 +18,7 @@ import org.http.HttpRequest;
 import org.http.chain.util.Constant;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseHttpRequest implements HttpRequest , HttpParameterOperation{
+public abstract class BaseHttpRequest implements HttpRequest {
 
 	private final HttpRequestBase request;
 	

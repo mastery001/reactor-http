@@ -9,6 +9,8 @@ import org.http.chain.support.BaseHttpService;
 import org.http.chain.util.ExceptionMonitor;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpSessionClosedException;
+import org.http.executor.GlobalHttpExecutor;
+import org.http.executor.HttpExecutor;
 
 public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements HttpAcceptor<T> {
 
@@ -22,6 +24,8 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 	 * 判断filterChain是否build 2016年1月20日 下午1:25:48
 	 */
 	private volatile boolean isBuildChain;
+	
+	private HttpExecutor executor;
 
 	public BaseHttpAcceptor() {
 		this(null);
@@ -87,9 +91,18 @@ public abstract class BaseHttpAcceptor<T> extends BaseHttpService implements Htt
 		isBuildChain = build;
 	}
 
-	@Override
 	public HttpClientFactory getHttpClientFactory() {
 		return this.httpClientFactory;
+	}
+
+	protected HttpExecutor getExecutor() {
+		if(executor == null) 
+			setExecutor(GlobalHttpExecutor.getInstance());
+		return executor;
+	}
+
+	protected void setExecutor(HttpExecutor executor) {
+		this.executor = executor;
 	}
 	
 }
