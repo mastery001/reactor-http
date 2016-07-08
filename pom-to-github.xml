@@ -1,0 +1,161 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.github.mastery001</groupId>
+	<artifactId>reactor-http</artifactId>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<name>reactor-http</name>
+	<url>https://github.com/mastery001/reactor-http</url>
+	<description>This is based on httpClient's reactor</description>
+
+	<build>
+		<finalName>reactor-http</finalName>
+		<plugins>
+			<!-- Source -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Javadoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Gpg Signature -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<distributionManagement>
+				<snapshotRepository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+				</snapshotRepository>
+				<repository>
+					<id>oss</id>
+					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+				</repository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>log.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>log.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>log.logback</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.7</version>
+		</dependency>
+		<dependency>
+			<groupId>log.logback</groupId>
+			<artifactId>classic</artifactId>
+			<version>1.0.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.1.41</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.4.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.cache</groupId>
+			<artifactId>cache-consistency</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+	</dependencies>
+
+	<issueManagement>
+		<system>Github Issue</system>
+		<url>https://github.com/mastery001/reactor-http/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Dolphin</name>
+			<email>basic54zb@outlook.com</email>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git@github.com:mastery001/reactor-http.git</connection>
+		<developerConnection>scm:git@github.com:mastery001/reactor-http.git</developerConnection>
+		<url>git@github.com:mastery001/reactor-http.git</url>
+	</scm>
+
+</project>
