@@ -43,5 +43,5 @@ public interface HttpAcceptor<T> {
 	 * @time 2016年3月25日下午8:28:46
 	 * @return
 	 */
-	HttpClientFactory getHttpClientFactory();
+//	HttpClientFactory getHttpClientFactory();
 }

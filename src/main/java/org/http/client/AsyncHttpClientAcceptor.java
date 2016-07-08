@@ -89,7 +89,7 @@ public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpRespons
 			throws HttpSessionClosedException, HttpInvokeException {
 		// 创建session
 		HttpClientSession session = new HttpClientSession(this, request, handler,
-				httpClientFactory);
+				httpClientFactory , getExecutor());
 		return session;
 	}
 

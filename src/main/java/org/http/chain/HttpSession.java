@@ -2,6 +2,7 @@ package org.http.chain;
 
 import org.http.HttpClientFactory;
 import org.http.HttpRequest;
+import org.http.executor.HttpExecutor;
 
 /**
  * 每个请求会有一个独立的session
@@ -40,6 +41,13 @@ public interface HttpSession {
 	 * 2016年1月20日 下午5:18:17
 	 */
 	HttpRequest getHttpRequest();
+	
+	/**
+	 * http执行器
+	 * @return
+	 * 2016年7月6日 下午2:46:49
+	 */
+	HttpExecutor getHttpExecutor();
 
 	/**
 	 * 主动关闭session的连接，即停止http请求 

@@ -6,6 +6,7 @@ import org.http.chain.HttpFilterChain;
 import org.http.chain.HttpHandler;
 import org.http.chain.HttpService;
 import org.http.chain.support.BaseHttpSession;
+import org.http.executor.HttpExecutor;
 
 class HttpClientSession extends BaseHttpSession {
 
@@ -21,15 +22,18 @@ class HttpClientSession extends BaseHttpSession {
 	
 	private final HttpClientFactory httpClientFactory;
 	
+	private final HttpExecutor httpExecutor;
+	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequest httpRequest, HttpHandler handler ,HttpClientFactory httpClientFactory) {
+	public HttpClientSession(HttpService service, HttpRequest httpRequest, HttpHandler handler ,HttpClientFactory httpClientFactory , HttpExecutor httpExecutor) {
 		this.service = service;
 		this.httpRequest = httpRequest;
 		this.filterChain = new HttpClientFilterChain();
 //		this.filterProcessor = filterProcessor;
 		this.httpClientFactory = httpClientFactory;
 		this.handler = handler;
+		this.httpExecutor = httpExecutor;
 	}
 
 	@Override
@@ -92,5 +96,10 @@ class HttpClientSession extends BaseHttpSession {
 	@Override
 	public HttpClientFactory getHttpClientFactory() {
 		return httpClientFactory;
+	}
+
+	@Override
+	public HttpExecutor getHttpExecutor() {
+		return httpExecutor;
 	}
 }
