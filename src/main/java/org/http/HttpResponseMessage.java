@@ -1,9 +1,9 @@
 package org.http;
 
-import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.http.exception.HttpResponseProcessException;
 
-public interface HttpResponseMessage extends HttpResponse{
+public interface HttpResponseMessage extends CloseableHttpResponse{
 
 	int SUCCESS_CODE = 200;
 	
@@ -19,7 +19,7 @@ public interface HttpResponseMessage extends HttpResponse{
 	
 	/**
 	 * 得到内容，忽略HttpResponseProcessException异常
-	 * 
+	 * 不建议使用#getEntity方法，因为该方法得到是null
 	 * @throws HttpResponseProcessException
 	 * @return
 	 * 2016年7月6日 下午2:53:59
@@ -33,4 +33,9 @@ public interface HttpResponseMessage extends HttpResponse{
 	 * @throws HttpResponseProcessException 
 	 */
 	byte[] getResponseBody() throws HttpResponseProcessException;
+	
+	/**
+	 * 关闭连接和消费实体，不抛出异常
+	 */
+	void closeQuietly();
 }

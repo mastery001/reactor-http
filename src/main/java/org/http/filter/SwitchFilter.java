@@ -116,9 +116,10 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 	 * @return 2016年3月2日 下午3:50:43
 	 */
 	private boolean retryRequest(HttpRequest request, long sleepTime, HttpSession session) {
+		HttpResponseMessage response = null;
 		try {
 			TimeUnit.SECONDS.sleep(sleepTime);
-			HttpResponseMessage response = session.getHttpExecutor().execute(session.getHttpClientFactory(), request);
+			response = session.getHttpExecutor().execute(session.getHttpClientFactory(), request);
 			if (response.isSuccess()) {
 				cache.set(session.getName(), new FatalCount());
 				return true;
@@ -126,6 +127,10 @@ public abstract class SwitchFilter extends HttpFilterAdapter {
 		} catch (InterruptedException e) {
 			logger.info("retry request error ; exception is {}", e);
 		} catch (Exception e) {
+		}finally {
+			if(response != null) {
+				response.closeQuietly();
+			}
 		}
 		return false;
 	}
