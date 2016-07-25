@@ -16,10 +16,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.http.HttpParameterOperation;
 import org.http.HttpRequest;
+import org.http.Releaseable;
 import org.http.chain.util.UrlFormatUtil;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseHttpRequest implements HttpRequest {
+public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 
 	private final HttpRequestBase request;
 	
@@ -41,7 +42,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	 * 参数构造器 2016年1月19日 下午6:19:51
 	 */
 //	private final ParamBuilder paramBuilder = new ParamBuilder();
-	private final List <NameValuePair> params = new ArrayList <NameValuePair>();
+	private List <NameValuePair> params;
 	
 	/**
 	 * 默认采用非重试机制发送请求
@@ -57,6 +58,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 		this.baseUrl = baseUrl;
 		this.isRetry = isRetry;
 		request = initRequest(baseUrl);
+		request.setHeader("Connection", "close");
 		Objects.requireNonNull(request , "request should be init");
 	}
 	
@@ -74,7 +76,8 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	@Override
 	public HttpUriRequest concreteRequest() {
 		if(requestUrl == null) {
-			request.setURI(URI.create(getCompleteUrl()));
+			requestUrl = getCompleteUrl();
+			request.setURI(URI.create(requestUrl));
 		}
 		return request;
 	}
@@ -88,6 +91,9 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	}
 
 	protected List <NameValuePair> parameters() {
+		if(params == null) {
+			params = new ArrayList <NameValuePair>();
+		}
 		return params;
 	}
 	
@@ -216,12 +222,22 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	@Override
 	public HttpParameterOperation addParameter(String paramName, Object paramValue) {
 		//paramBuilder.addParameter(paramName, paramValue);
-		if(paramName != null) {
-			params.add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
+		// 判断null减少内存使用
+		if(paramName != null && paramValue != null) {
+			parameters().add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
 		}
 		return this;
 	}
 
+	@Override
+	public void release() {
+		// 释放内存
+		params = null;
+		request.releaseConnection();
+	}
+	
+
+	
 	/**
 	 * 参数构造器
 	 * 

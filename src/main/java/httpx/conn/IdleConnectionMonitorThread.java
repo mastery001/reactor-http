@@ -27,7 +27,7 @@ public class IdleConnectionMonitorThread extends Thread {
 	private volatile boolean shutdown;
 
 	public IdleConnectionMonitorThread(HttpClientConnectionManager connMgr) {
-		super();
+		super("IdleConnectionMonitorThread");
 		this.connMgr = connMgr;
 	}
 

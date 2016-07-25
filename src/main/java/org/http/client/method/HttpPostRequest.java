@@ -27,7 +27,7 @@ public class HttpPostRequest extends BaseHttpEntityRequest {
 
 	@Override
 	public HttpUriRequest concreteRequest() {
-		if (getEntity() != null) {
+		if (getEntity() != null && !(getEntity() instanceof UrlEncodedFormEntity)) {
 			return super.concreteRequest();
 		}
 		try {

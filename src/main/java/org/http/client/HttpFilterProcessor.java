@@ -11,6 +11,7 @@ import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestRetryHandler;
 import org.http.HttpResponseMessage;
+import org.http.Releaseable;
 import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
@@ -59,15 +60,19 @@ abstract class HttpFilterProcessor<T> {
 			}
 		} catch (HttpInvokeException e) {
 			session.getFilterChain().fireExceptionCaught(session, e);
+			request.abort();
 			throw e;
 		} finally {
+			session.getFilterChain().fireSessionClosed(session);
+			session.updateLastAccessedTime();
+			if(request instanceof Releaseable) {
+				((Releaseable) request).release();
+			}
 			// 消费实体，释放内存,保证都关闭
 			if (responseMessage != null) {
 				responseMessage.closeQuietly();
 			}
 
-			session.getFilterChain().fireSessionClosed(session);
-			session.updateLastAccessedTime();
 		}
 		return responseMessage;
 	}

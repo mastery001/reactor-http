@@ -17,6 +17,8 @@ public class DefaultHttpClientFactory extends HttpClientFactory {
 	protected HttpClientBuilder build(HttpClientBuilder builder) {
 		RequestConfig config = initConfig(RequestConfig.custom());
 		HttpClientConnectionManager cm = initConnectionManager();
+		// 开启自动清理无效连接的线程
+		new IdleConnectionMonitorThread(cm).start();
 		builder.setDefaultRequestConfig(config).setConnectionManager(cm);
 		return builder;
 	}
@@ -26,14 +28,12 @@ public class DefaultHttpClientFactory extends HttpClientFactory {
 	 * @return
 	 * 2016年7月8日 下午1:19:39
 	 */
-	private HttpClientConnectionManager initConnectionManager() {
+	protected HttpClientConnectionManager initConnectionManager() {
 		PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
 		// Increase max total connection to 200
 		cm.setMaxTotal(200);
 		// Increase default max connection per route to 20
 		cm.setDefaultMaxPerRoute(20);
-		// 开启自动清理无效连接的线程
-		new IdleConnectionMonitorThread(cm).start();
 		return cm;
 	}
 	
@@ -44,7 +44,9 @@ public class DefaultHttpClientFactory extends HttpClientFactory {
 	 * 2016年7月8日 下午1:19:33
 	 */
 	protected RequestConfig initConfig(RequestConfig.Builder configBuilder) {
-		return configBuilder.setConnectTimeout(1000).setSocketTimeout(4000).build();
+		return configBuilder.setConnectTimeout(1000)
+				.setSocketTimeout(4000)
+				.build();
 	}
 
 }

@@ -23,6 +23,15 @@ CHANGELOG
 
 1. 修复Attempted read from closed stream异常
 
+- v1.0.3
+
+1. 将连接执行完成后释放
+2. request自动添加Header：Connection -> close
+
+- v1.0.4
+
+1. 添加Releaseable接口，用于释放request资源
+
 
 
 	
