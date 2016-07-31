@@ -30,7 +30,8 @@ CHANGELOG
 
 - v1.0.4
 
-1. 添加Releaseable接口，用于释放request资源
+1. 添加Releaseable接口，用于释放request资源 
+2. 添加请求参数时当值为空的时候也可以添加
 
 
 

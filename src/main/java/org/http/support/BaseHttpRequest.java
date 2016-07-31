@@ -223,8 +223,12 @@ public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 	public HttpParameterOperation addParameter(String paramName, Object paramValue) {
 		//paramBuilder.addParameter(paramName, paramValue);
 		// 判断null减少内存使用
-		if(paramName != null && paramValue != null) {
-			parameters().add(new BasicNameValuePair(paramName, String.valueOf(paramValue)));
+		if(paramName != null) {
+			String value = "";
+			if(paramValue != null ){
+				value = String.valueOf(paramValue);
+			}
+			parameters().add(new BasicNameValuePair(paramName, value));
 		}
 		return this;
 	}

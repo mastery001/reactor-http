@@ -4,7 +4,7 @@
 
 	<groupId>org.http</groupId>
 	<artifactId>reactor-http</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.4.2</version>
 	<packaging>jar</packaging>
 
 	<name>reactor-http</name>
