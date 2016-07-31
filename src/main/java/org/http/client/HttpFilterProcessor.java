@@ -11,6 +11,7 @@ import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestRetryHandler;
 import org.http.HttpResponseMessage;
+import org.http.Releaseable;
 import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
@@ -40,7 +41,7 @@ abstract class HttpFilterProcessor<T> {
 	 * @param request
 	 * @param session
 	 * @param httpClientFactory
-	 * @param executor 
+	 * @param executor
 	 * @return
 	 * @throws Exception
 	 *             2016年2月24日 下午1:20:46
@@ -51,7 +52,7 @@ abstract class HttpFilterProcessor<T> {
 		checkSessionClose(session);
 		HttpResponseMessage responseMessage = null;
 		try {
-			responseMessage = process(request, httpClientFactory , session);
+			responseMessage = process(request, httpClientFactory, session);
 			if (responseMessage.isSuccess()) {
 				session.getFilterChain().fireRequestSuccessed(session, responseMessage);
 			} else {
@@ -59,10 +60,19 @@ abstract class HttpFilterProcessor<T> {
 			}
 		} catch (HttpInvokeException e) {
 			session.getFilterChain().fireExceptionCaught(session, e);
+			request.abort();
 			throw e;
 		} finally {
 			session.getFilterChain().fireSessionClosed(session);
 			session.updateLastAccessedTime();
+			if(request instanceof Releaseable) {
+				((Releaseable) request).release();
+			}
+			// 消费实体，释放内存,保证都关闭
+			if (responseMessage != null) {
+				responseMessage.closeQuietly();
+			}
+
 		}
 		return responseMessage;
 	}
@@ -70,15 +80,15 @@ abstract class HttpFilterProcessor<T> {
 	private HttpResponseMessage process(HttpRequest request, HttpClientFactory httpClientFactory, HttpSession session)
 			throws HttpInvokeException {
 		try {
-			//HttpUriRequest concreteRequest = request.concreteRequest();
+			// HttpUriRequest concreteRequest = request.concreteRequest();
 			/**
 			 * 执行方法
 			 */
-			if(request.isRetry()) {
-				return retryProcess(request , httpClientFactory , session);
+			if (request.isRetry()) {
+				return retryProcess(request, httpClientFactory, session);
 			}
 			return session.getHttpExecutor().execute(httpClientFactory, request);
-			
+
 		} catch (IOException e) {
 			if (e instanceof ClientProtocolException) {
 				throw new HttpInvokeException(InvokeErrorCode.HTTP_PROTOCOL_INVAILD, e);
@@ -93,7 +103,8 @@ abstract class HttpFilterProcessor<T> {
 		}
 	}
 
-	private HttpResponseMessage retryProcess(HttpRequest concreteRequest, HttpClientFactory httpClientFactory, HttpSession session) throws IOException {
+	private HttpResponseMessage retryProcess(HttpRequest concreteRequest, HttpClientFactory httpClientFactory,
+			HttpSession session) throws IOException {
 		HttpRequestRetryHandler retryHandler = new HttpRetryHandler();
 		final Header[] origheaders = concreteRequest.getAllHeaders();
 		HttpResponseMessage reponse = null;
@@ -115,20 +126,20 @@ abstract class HttpFilterProcessor<T> {
 						this.log.info("Retrying request to " + concreteRequest.getURI());
 					}
 				} else {
-                    if (ex instanceof NoHttpResponseException) {
-                        final NoHttpResponseException updatedex = new NoHttpResponseException(
-                        		concreteRequest.getURI() + " failed to respond");
-                        updatedex.setStackTrace(ex.getStackTrace());
-                        throw updatedex;
-                    } else {
-                        throw ex;
-                    }
-                }
+					if (ex instanceof NoHttpResponseException) {
+						final NoHttpResponseException updatedex = new NoHttpResponseException(
+								concreteRequest.getURI() + " failed to respond");
+						updatedex.setStackTrace(ex.getStackTrace());
+						throw updatedex;
+					} else {
+						throw ex;
+					}
+				}
 				continue;
 			}
 			return reponse;
 		}
-		
+
 	}
 
 	/**

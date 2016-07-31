@@ -7,9 +7,9 @@ import java.util.Locale;
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.http.HttpResponseMessage;
@@ -19,9 +19,9 @@ import org.http.exception.HttpResponseProcessException;
 @SuppressWarnings("deprecation")
 public class DefaultHttpResponseMessage implements HttpResponseMessage {
 
-	private final HttpResponse response;
+	private final CloseableHttpResponse response;
 
-	public DefaultHttpResponseMessage(HttpResponse response) {
+	public DefaultHttpResponseMessage(CloseableHttpResponse response) {
 		this.response = response;
 	}
 
@@ -166,7 +166,7 @@ public class DefaultHttpResponseMessage implements HttpResponseMessage {
 	}
 
 	@Override
-	public String getContent(){
+	public String getContent() {
 		try {
 			return content();
 		} catch (HttpResponseProcessException e) {
@@ -177,30 +177,52 @@ public class DefaultHttpResponseMessage implements HttpResponseMessage {
 
 	@Override
 	public byte[] getResponseBody() throws HttpResponseProcessException {
-		if(byteContents == null) {
+		if (byteContents == null) {
 			synchronized (lock) {
 				try {
-					byteContents =  EntityUtils.toByteArray(this.getEntity());
-				}catch (IOException e) {
+					byteContents = EntityUtils.toByteArray(this.getEntity());
+				} catch (IOException e) {
 					throw new HttpResponseProcessException(e);
+				}finally {
+					// 消费实体，
+					try {
+						EntityUtils.consume(getEntity());
+					} catch (IOException e) {
+						ExceptionMonitor.getInstance().ignoreCaught(e);
+					}
 				}
 			}
 		}
 		return byteContents;
 	}
-	
+
 	private byte[] byteContents;
-	
+
 	private final byte[] lock = new byte[0];
 
 	@Override
 	public String content() throws HttpResponseProcessException {
 		try {
-			return new String(getResponseBody() , "UTF-8");
+			return new String(getResponseBody(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			// never happen
 		}
 		return null;
+	}
+
+	@Override
+	public void close() throws IOException {
+		response.close();
+	}
+
+	@Override
+	public void closeQuietly() {
+		// 释放内存,保证都关闭
+		try {
+			close();
+		} catch (IOException e) {
+			ExceptionMonitor.getInstance().ignoreCaught(e);
+		}
 	}
 
 }

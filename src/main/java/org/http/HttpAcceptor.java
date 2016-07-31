@@ -14,7 +14,7 @@ import org.http.exception.HttpSessionClosedException;
 public interface HttpAcceptor<T> {
 
 	/**
-	 * 处理请求的根方法
+	 * 处理请求的根方法,调用该方法后，请求自动关闭
 	 * 
 	 * @param request
 	 * @return
@@ -25,7 +25,7 @@ public interface HttpAcceptor<T> {
 	T service(HttpRequest request) throws HttpSessionClosedException, HttpInvokeException;
 
 	/**
-	 * 针对单个http请求的个性化操作
+	 * 针对单个http请求的个性化操作，调用该方法后，请求自动关闭
 	 * 
 	 * @param request
 	 * @param handler

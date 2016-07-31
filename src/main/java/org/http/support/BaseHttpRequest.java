@@ -1,38 +1,48 @@
 package org.http.support;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.apache.http.Header;
 import org.apache.http.HeaderIterator;
+import org.apache.http.NameValuePair;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.RequestLine;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.http.HttpParameterOperation;
 import org.http.HttpRequest;
-import org.http.chain.util.Constant;
+import org.http.Releaseable;
+import org.http.chain.util.UrlFormatUtil;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseHttpRequest implements HttpRequest {
+public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 
 	private final HttpRequestBase request;
 	
 	protected String baseUrl;
 	
 	/**
+	 * 完整路径
+	 */
+	private String requestUrl;
+	
+	/**
 	 * 采用重试机制，重试发送 2016年1月18日 下午6:06:15
 	 */
 	private boolean isRetry;
 	
+	private boolean logEnabled = true;
+	
 	/**
 	 * 参数构造器 2016年1月19日 下午6:19:51
 	 */
-	private final ParamBuilder paramBuilder = new ParamBuilder();
+//	private final ParamBuilder paramBuilder = new ParamBuilder();
+	private List <NameValuePair> params;
 	
 	/**
 	 * 默认采用非重试机制发送请求
@@ -48,6 +58,7 @@ public abstract class BaseHttpRequest implements HttpRequest {
 		this.baseUrl = baseUrl;
 		this.isRetry = isRetry;
 		request = initRequest(baseUrl);
+		request.setHeader("Connection", "close");
 		Objects.requireNonNull(request , "request should be init");
 	}
 	
@@ -64,9 +75,9 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpUriRequest concreteRequest() {
-		String url = getCompleteUrl();
-		if(url != null) {
-			request.setURI(URI.create(url));
+		if(requestUrl == null) {
+			requestUrl = getCompleteUrl();
+			request.setURI(URI.create(requestUrl));
 		}
 		return request;
 	}
@@ -76,30 +87,26 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	}
 	
 	String getCompleteUrl() {
-		if(!paramBuilder.isEmpty()) {
-			StringBuilder urlBuilder = new StringBuilder();
-			urlBuilder.append(getBaseUrl());
-			String join = Constant.INTERROGATION;
-			Map<String, Object> map = paramBuilder.getParameters();
-			Iterator<String> it = map.keySet().iterator();
-			String key = it.next();
-			// if have ?
-			if (urlBuilder.indexOf(Constant.INTERROGATION) == -1) {
-				urlBuilder.append(join).append(key).append(Constant.EQUAL).append(map.get(key));
-				join = Constant.AND;
-			}
-			while (it.hasNext()) {
-				key = it.next();
-				urlBuilder.append(join).append(key).append(Constant.EQUAL).append(map.get(key));
-			}
-			if (join.equals(Constant.INTERROGATION) && !it.hasNext()) {
-				urlBuilder.append(Constant.AND).append(key).append(Constant.EQUAL).append(map.get(key));
-			}
-			paramBuilder.clear();
-			return urlBuilder.toString();
+		return UrlFormatUtil.formatUrl(getBaseUrl(), parameters());
+	}
+
+	protected List <NameValuePair> parameters() {
+		if(params == null) {
+			params = new ArrayList <NameValuePair>();
 		}
-		return null;
-		
+		return params;
+	}
+	
+
+	@Override
+	public HttpRequest logEnabled(boolean enable) {
+		logEnabled = enable;
+		return this;
+	}
+
+	@Override
+	public boolean logEnabled() {
+		return logEnabled;
 	}
 
 	@Override
@@ -214,10 +221,27 @@ public abstract class BaseHttpRequest implements HttpRequest {
 
 	@Override
 	public HttpParameterOperation addParameter(String paramName, Object paramValue) {
-		paramBuilder.addParameter(paramName, paramValue);
+		//paramBuilder.addParameter(paramName, paramValue);
+		// 判断null减少内存使用
+		if(paramName != null) {
+			String value = "";
+			if(paramValue != null ){
+				value = String.valueOf(paramValue);
+			}
+			parameters().add(new BasicNameValuePair(paramName, value));
+		}
 		return this;
 	}
 
+	@Override
+	public void release() {
+		// 释放内存
+		params = null;
+		request.releaseConnection();
+	}
+	
+
+	
 	/**
 	 * 参数构造器
 	 * 
@@ -225,26 +249,26 @@ public abstract class BaseHttpRequest implements HttpRequest {
 	 *
 	 *         2016年1月19日 下午5:58:13
 	 */
-	private class ParamBuilder {
-		private final Map<String, Object> params = new HashMap<String, Object>(8);
-
-		public ParamBuilder addParameter(String paramName, Object paramValue) {
-			params.put(paramName, paramValue);
-			return this;
-		}
-
-		public Map<String, Object> getParameters() {
-			return params;
-		}
-
-		public ParamBuilder clear() {
-			params.clear();
-			return this;
-		}
-		
-		public boolean isEmpty() {
-			return params.isEmpty();
-		}
-	}
+//	private class ParamBuilder {
+//		private final Map<String, Object> params = new HashMap<String, Object>(8);
+//
+//		public ParamBuilder addParameter(String paramName, Object paramValue) {
+//			params.put(paramName, paramValue);
+//			return this;
+//		}
+//
+//		public Map<String, Object> getParameters() {
+//			return params;
+//		}
+//
+//		public ParamBuilder clear() {
+//			params.clear();
+//			return this;
+//		}
+//		
+//		public boolean isEmpty() {
+//			return params.isEmpty();
+//		}
+//	}
 	
 }

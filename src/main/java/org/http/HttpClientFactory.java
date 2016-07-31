@@ -1,6 +1,6 @@
 package org.http;
 
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
@@ -14,7 +14,7 @@ public abstract class HttpClientFactory {
 
 	private final HttpClientBuilder builder = HttpClients.custom();
 	
-	private final HttpClient httpClient;
+	private final CloseableHttpClient httpClient;
 	
 	public HttpClientFactory() {
 		// 默认取消重试
@@ -28,7 +28,7 @@ public abstract class HttpClientFactory {
 	 * @return
 	 * 2016年1月18日 下午4:15:02
 	 */
-	public HttpClient getConnection() {
+	public CloseableHttpClient getConnection() {
 		return httpClient;
 	}
 }

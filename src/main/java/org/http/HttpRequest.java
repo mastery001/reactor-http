@@ -14,6 +14,15 @@ public interface HttpRequest extends HttpUriRequest , HttpMessage , HttpParamete
 	boolean isRetry();
 	
 	/**
+	 * 是否开启日志，默认开启
+	 * @param enable	
+	 * @return
+	 */
+	HttpRequest logEnabled(boolean enable);
+	
+	boolean logEnabled();
+	
+	/**
 	 * 获取真实的request请求
 	 * @return
 	 * 2016年6月2日 下午9:47:38
