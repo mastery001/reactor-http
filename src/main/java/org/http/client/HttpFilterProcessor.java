@@ -11,12 +11,11 @@ import org.http.HttpClientFactory;
 import org.http.HttpRequest;
 import org.http.HttpRequestRetryHandler;
 import org.http.HttpResponseMessage;
-import org.http.Releaseable;
+import org.http.HttpRetryAware;
 import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpInvokeException.InvokeErrorCode;
 import org.http.exception.HttpSessionClosedException;
-import org.http.support.HttpRetryHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,14 +64,6 @@ abstract class HttpFilterProcessor<T> {
 		} finally {
 			session.getFilterChain().fireSessionClosed(session);
 			session.updateLastAccessedTime();
-			if(request instanceof Releaseable) {
-				((Releaseable) request).release();
-			}
-			// 消费实体，释放内存,保证都关闭
-			if (responseMessage != null) {
-				responseMessage.closeQuietly();
-			}
-
 		}
 		return responseMessage;
 	}
@@ -84,8 +75,11 @@ abstract class HttpFilterProcessor<T> {
 			/**
 			 * 执行方法
 			 */
-			if (request.isRetry()) {
-				return retryProcess(request, httpClientFactory, session);
+			if(request instanceof HttpRetryAware) {
+				HttpRetryAware retryRequest = (HttpRetryAware) request;
+				if(retryRequest.isRetry()) {
+					return retryProcess(request, httpClientFactory, session , retryRequest.retryHandler());
+				}
 			}
 			return session.getHttpExecutor().execute(httpClientFactory, request);
 
@@ -104,8 +98,7 @@ abstract class HttpFilterProcessor<T> {
 	}
 
 	private HttpResponseMessage retryProcess(HttpRequest concreteRequest, HttpClientFactory httpClientFactory,
-			HttpSession session) throws IOException {
-		HttpRequestRetryHandler retryHandler = new HttpRetryHandler();
+			HttpSession session, HttpRequestRetryHandler retryHandler) throws IOException {
 		final Header[] origheaders = concreteRequest.getAllHeaders();
 		HttpResponseMessage reponse = null;
 		for (int execCount = 1;; execCount++) {

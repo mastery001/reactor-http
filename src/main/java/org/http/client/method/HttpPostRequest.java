@@ -17,17 +17,17 @@ public class HttpPostRequest extends BaseHttpEntityRequest {
 	}
 
 	public HttpPostRequest(String baseUrl, HttpEntity entity) {
-		this(baseUrl);
-		setEntity(entity);
+		this(baseUrl , entity , false);
 	}
 
-	public HttpPostRequest(String baseUrl, boolean isRetry) {
+	public HttpPostRequest(String baseUrl, HttpEntity entity, boolean isRetry) {
 		super(baseUrl, isRetry);
+		setEntity(entity);
 	}
 
 	@Override
 	public HttpUriRequest concreteRequest() {
-		if (getEntity() != null && !(getEntity() instanceof UrlEncodedFormEntity)) {
+		if (getEntity() != null) {
 			return super.concreteRequest();
 		}
 		try {

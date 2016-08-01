@@ -20,29 +20,23 @@ public class LoggerFilter extends HttpFilterAdapter {
 	@Override
 	public void requestFailed(NextHttpFilter nextFilter, HttpSession session, HttpResponseMessage responseMessage)
 			throws Exception {
-		if (session.getHttpRequest().logEnabled()) {
-			logger.error("调用http请求失败: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
-					+ "ms, 响应码: " + responseMessage.getStatusLine().getStatusCode());
-		}
+		logger.error("调用http请求失败: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
+				+ "ms, 响应码: " + responseMessage.getStatusLine().getStatusCode());
 		nextFilter.requestFailed(session, responseMessage);
 	}
 
 	@Override
 	public void requestSuccessed(NextHttpFilter nextFilter, HttpSession session, HttpResponseMessage responseMessage)
 			throws Exception {
-		if (session.getHttpRequest().logEnabled()) {
-			logger.info("调用http请求成功: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
-					+ "ms, 响应码: " + responseMessage.getStatusLine().getStatusCode());
-		}
+		logger.info("调用http请求成功: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
+				+ "ms, 响应码: " + responseMessage.getStatusLine().getStatusCode());
 		nextFilter.requestSuccessed(session, responseMessage);
 	}
 
 	@Override
 	public void exceptionCaught(NextHttpFilter nextFilter, HttpSession session, Throwable cause) throws Exception {
-		if (session.getHttpRequest().logEnabled()) {
-			logger.info("调用http请求异常: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
-					+ "ms, exception:" + cause.getMessage());
-		}
+		logger.info("调用http请求异常: " + session.getHttpRequest().getURI() + ",耗时：" + session.getSurvivalTime()
+				+ "ms, exception:" + cause.getMessage());
 		nextFilter.exceptionCaught(session, cause);
 	}
 

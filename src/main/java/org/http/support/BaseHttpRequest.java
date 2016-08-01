@@ -20,8 +20,8 @@ import org.http.Releaseable;
 import org.http.chain.util.UrlFormatUtil;
 
 @SuppressWarnings("deprecation")
-public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
-
+public abstract class BaseHttpRequest extends AbstractRetryAwareRequest implements HttpRequest , Releaseable {
+	
 	private final HttpRequestBase request;
 	
 	protected String baseUrl;
@@ -30,13 +30,6 @@ public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 	 * 完整路径
 	 */
 	private String requestUrl;
-	
-	/**
-	 * 采用重试机制，重试发送 2016年1月18日 下午6:06:15
-	 */
-	private boolean isRetry;
-	
-	private boolean logEnabled = true;
 	
 	/**
 	 * 参数构造器 2016年1月19日 下午6:19:51
@@ -56,10 +49,12 @@ public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 	
 	public BaseHttpRequest(String baseUrl , boolean isRetry) {
 		this.baseUrl = baseUrl;
-		this.isRetry = isRetry;
+		if(isRetry) {
+			retry();
+		}
 		request = initRequest(baseUrl);
-		request.setHeader("Connection", "close");
 		Objects.requireNonNull(request , "request should be init");
+		request.setHeader("Connection", "close");
 	}
 	
 	protected abstract HttpRequestBase initRequest(String baseUrl);
@@ -68,11 +63,6 @@ public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 		return request;
 	}
 	
-	@Override
-	public boolean isRetry() {
-		return isRetry;
-	}
-
 	@Override
 	public HttpUriRequest concreteRequest() {
 		if(requestUrl == null) {
@@ -95,18 +85,6 @@ public abstract class BaseHttpRequest implements HttpRequest , Releaseable {
 			params = new ArrayList <NameValuePair>();
 		}
 		return params;
-	}
-	
-
-	@Override
-	public HttpRequest logEnabled(boolean enable) {
-		logEnabled = enable;
-		return this;
-	}
-
-	@Override
-	public boolean logEnabled() {
-		return logEnabled;
 	}
 
 	@Override
