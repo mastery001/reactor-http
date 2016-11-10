@@ -4,7 +4,7 @@
 
 	<groupId>com.github.mastery001</groupId>
 	<artifactId>reactor-http</artifactId>
-	<version>1.0.4.2</version>
+	<version>1.0.4.3</version>
 	<packaging>jar</packaging>
 
 	<name>reactor-http</name>
