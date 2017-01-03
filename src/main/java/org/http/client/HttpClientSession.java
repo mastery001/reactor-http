@@ -12,11 +12,7 @@ class HttpClientSession extends BaseHttpSession {
 
 	private final HttpService service;
 
-	private final HttpRequest httpRequest;
-
 	private final HttpFilterChain filterChain;
-
-	private final HttpHandler handler;
 
 //	private final HttpClientProccessor filterProcessor;
 	
@@ -24,18 +20,26 @@ class HttpClientSession extends BaseHttpSession {
 	
 	private final HttpExecutor httpExecutor;
 	
+	private HttpRequest httpRequest;
+	
+	private HttpHandler handler;
+	
 	private Object attachment;
 
-	public HttpClientSession(HttpService service, HttpRequest httpRequest, HttpHandler handler ,HttpClientFactory httpClientFactory , HttpExecutor httpExecutor) {
+	public HttpClientSession(HttpService service ,HttpClientFactory httpClientFactory , HttpExecutor httpExecutor) {
 		this.service = service;
-		this.httpRequest = httpRequest;
 		this.filterChain = new HttpClientFilterChain();
 //		this.filterProcessor = filterProcessor;
 		this.httpClientFactory = httpClientFactory;
-		this.handler = handler;
 		this.httpExecutor = httpExecutor;
 	}
 
+	HttpClientSession processRequest(HttpRequest httpRequest , HttpHandler handler) {
+		this.httpRequest = httpRequest;
+		this.handler = handler;
+		return this;
+	}
+	
 	@Override
 	public HttpRequest getHttpRequest() {
 		return httpRequest;

@@ -35,3 +35,7 @@ CHANGELOG
 3. 重试策略以接口形式HttpRetryAware
 4. 将request和response的关闭开放
 
+- v2.0
+
+1. 使用ThreadLocal减少HttpClientSession对象的个数，使之变为长期对象，减少GC次数和提高空间利用率
+

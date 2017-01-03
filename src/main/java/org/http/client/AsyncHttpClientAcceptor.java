@@ -5,13 +5,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.http.HttpClientFactory;
-import org.http.HttpRequest;
 import org.http.HttpResponseMessage;
-import org.http.chain.HttpHandler;
 import org.http.chain.HttpSession;
 import org.http.exception.HttpInvokeException;
 import org.http.exception.HttpSessionClosedException;
-import org.http.support.BaseHttpAcceptor;
 
 /**
  * 暂时未开发完
@@ -20,7 +17,7 @@ import org.http.support.BaseHttpAcceptor;
  *
  *         2016年2月24日 上午11:36:13
  */
-public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpResponseMessage>> {
+public class AsyncHttpClientAcceptor extends AbstractHttpClientAcceptor<Future<HttpResponseMessage>> {
 
 	@SuppressWarnings("unused")
 	private final ExecutorService executor;
@@ -85,19 +82,10 @@ public class AsyncHttpClientAcceptor extends BaseHttpAcceptor<Future<HttpRespons
 	}
 
 	@Override
-	protected HttpSession prepareService(HttpRequest request, HttpHandler handler)
-			throws HttpSessionClosedException, HttpInvokeException {
-		// 创建session
-		HttpClientSession session = new HttpClientSession(this, request, handler,
-				httpClientFactory , getExecutor());
-		return session;
-	}
-
-	@Override
-	protected Future<HttpResponseMessage> doService(HttpRequest request, HttpHandler handler, HttpSession session)
+	protected Future<HttpResponseMessage> doService(HttpSession session)
 			throws HttpSessionClosedException, HttpInvokeException {
 		AyncHttpClientProccessor processor = getProcessor();
-		return processor.doWork(request, (HttpClientSession) session, httpClientFactory);
+		return processor.doWork(session.getHttpRequest(), (HttpClientSession) session, httpClientFactory);
 	}
 
 }
